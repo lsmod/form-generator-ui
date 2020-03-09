@@ -132,10 +132,7 @@ impl Component for App {
     fn view(&self) -> Html {
         let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
         let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
-        let id = match self.state.current_field_id {
-            Some(id) => format!("{:?}", id),
-            None => "pas d'id".to_string()
-        };
+
         let editing = if let Some(editing) = self.state.current_field_id { self.view_editing_field(editing) } else { html!{""} };
 
         // TODO: add on change for input
@@ -217,7 +214,10 @@ impl App {
     }
 
     fn view_editing_field(&self, index: usize) -> Html {
-        self.state.current_field = Some(self.state.model.fields[index].clone());
+        // TODO: this is the view who only got a &self ,
+        // modification are to be done in update that got a &mut self !!!
+        // TODO: add an action to display view field (toggle a state & copy field data)
+//        self.state.current_field = Some(self.state.model.fields[index].clone());
         let field = self.state.current_field.clone().unwrap();
         html! {
             <div class="model-field-editing">
