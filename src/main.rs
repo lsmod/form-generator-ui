@@ -39,7 +39,11 @@ enum Msg {
 
     EditField(usize),
     CancelEditField,
-    UpdateField(usize),
+    UpdateField,
+
+    UpdateFieldName(String),
+    UpdateFieldLabel(String),
+    UpdateFieldPlaceHolder(String),
     /*
 
 
@@ -51,9 +55,6 @@ enum Msg {
     DeleteField,
 
     UpdateFieldType,
-    UpdateFieldLabel,
-    UpdateFieldName,
-    UpdateFieldPlaceHolder,
 
     NewListValue,
     CreateFieldValue,
@@ -130,10 +131,36 @@ impl Component for App {
                 self.state.current_field = None;
                 true
             }
-            Msg::UpdateField(index) => {
-                self.state.current_field_id = None;
-                // self.state.model.fields[index] = // todo clone content
-                self.state.current_field = None;
+            Msg::UpdateField => {
+                match self.state.current_field_id {
+                    Some(index) => {
+                        self.state.current_field_id = None;
+                        self.state.model.fields[index] = self.state.current_field.as_ref().unwrap().clone();
+                        self.state.current_field = None;
+                    }
+                    None => ()
+                }
+                true
+            }
+            Msg::UpdateFieldName(name) => {
+                match &mut self.state.current_field {
+                    Some(field) => field.name = name,
+                    None => ()
+                };
+                true
+            }
+            Msg::UpdateFieldLabel(label) => {
+                match &mut self.state.current_field {
+                    Some(field) => field.label = label,
+                    None => ()
+                };
+                true
+            }
+            Msg::UpdateFieldPlaceHolder(placeholder) => {
+                match &mut self.state.current_field {
+                    Some(field) => field.placeholder = placeholder,
+                    None => ()
+                };
                 true
             }
         }
@@ -231,13 +258,36 @@ impl App {
         html! {
             <div class="model-field-editing">
                 <h3>{"Editing field: "}{&field.name}</h3>
-                {"Name:"} <input type="text" value={&field.name} />
+                {"Name:"}
+                <input
+                    type="text"
+                    value={&field.name}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateFieldName(input.value)
+                        })
+                />
                 {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
-                {"Label:"} <input type="text" value={&field.label} />
-                {"Placeholder:"} <input type="text" value={&field.placeholder} /><br/>
+                {"Label:"}
+                <input
+                    type="text"
+                    value={&field.label}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateFieldLabel(input.value)
+                        })
+                />
+                {"Placeholder:"} <input
+                    type="text"
+                    value={&field.placeholder}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateFieldPlaceHolder(input.value)
+                        })
+                /><br/>
                 {"Required :"} <input type="checkbox" name="required" required={field.required} />
                 <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
-                <button>{"save"}</button>
+                <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
             </div>
         }
     }
