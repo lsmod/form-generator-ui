@@ -13,9 +13,8 @@ use crate::form_model::form_model::FieldDataType::*;
 mod react_native;
 pub use react_native::to_html_type;
 
-
+// TODO move into separated module
 struct App {
-    clicked: bool,
     link: ComponentLink<App>,
     state: State
     // state -> model -> fields
@@ -23,8 +22,8 @@ struct App {
 }
 
 pub struct State {
-    current_field_id: Option<usize>,
-    current_field: Option<Field>,
+    current_field_id: Option<usize>, // merge these two
+    current_field: Option<Field>, // merge these two into a single wrapper to avoid inconsistend state
     model: Model,
 }
 // TODO:
@@ -33,16 +32,17 @@ pub struct State {
 
 
 enum Msg {
-    Click,
     UpdateName(String),
     UpdateTitle(String),
     UpdateSubtitle(String),
-    UpdateSubmitLabel(String)
+    UpdateSubmitLabel(String),
+
+    EditField(usize),
+    CancelEditField,
+    UpdateField(usize),
     /*
 
 
-    EditField,
-    UpdateField
 
     NewField,
     CreateField,
@@ -88,9 +88,8 @@ impl Component for App {
         });
         App {
             link,
-            clicked: false,
-            state: State {
-                current_field_id: Some(0),
+            state: State { // TODO : create a builder for this
+                current_field_id: None,
                 current_field: None,
                 model: Model {
                     name: "React-Native".to_string(),
@@ -105,10 +104,6 @@ impl Component for App {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Click => {
-                self.clicked = !self.clicked;
-                true // Indicate that the Component should re-render
-            },
             Msg::UpdateName(name) => {
                 self.state.model.name = name;
                 true // TODO: return true only if new id != previous one ?
@@ -125,7 +120,22 @@ impl Component for App {
                 self.state.model.submit_label = name;
                 true // TODO: return true only if new id != previous one ?
             }
-
+            Msg::EditField(index) => {
+                self.state.current_field_id = Some(index);
+                self.state.current_field = Some(self.state.model.fields[index].clone());
+                true
+            }
+            Msg::CancelEditField => {
+                self.state.current_field_id = None;
+                self.state.current_field = None;
+                true
+            }
+            Msg::UpdateField(index) => {
+                self.state.current_field_id = None;
+                // self.state.model.fields[index] = // todo clone content
+                self.state.current_field = None;
+                true
+            }
         }
     }
 
@@ -133,7 +143,7 @@ impl Component for App {
         let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
         let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
 
-        let editing = if let Some(editing) = self.state.current_field_id { self.view_editing_field(editing) } else { html!{""} };
+        let editing_view = if let Some(_editing_view) = self.state.current_field_id { self.view_editing_field() } else { html!{""} };
 
         // TODO: add on change for input
         html! {
@@ -177,7 +187,7 @@ impl Component for App {
                         </div>
                     </div>
                     <button>{"New field"}</button>
-                    { editing }
+                    { editing_view }
                     <div class="model-field-container">
                         <ul>
                         { for self.state.model.fields.iter().enumerate().map(|(index, field)| self.view_field(index, field)) }
@@ -199,7 +209,7 @@ impl App {
                 {"Label:"}{&field.label}
                 {"Placeholder"}{&field.placeholder}
                 {"Required"}{&field.required}
-                <button>{"edit"}</button>
+                <button onclick=self.link.callback(move |_| Msg::EditField(index))>{"edit"}</button>
                 <button>{"delete"}</button>
             </li>
         }
@@ -213,12 +223,11 @@ impl App {
         }
     }
 
-    fn view_editing_field(&self, index: usize) -> Html {
+    fn view_editing_field(&self) -> Html {
         // TODO: this is the view who only got a &self ,
         // modification are to be done in update that got a &mut self !!!
         // TODO: add an action to display view field (toggle a state & copy field data)
-//        self.state.current_field = Some(self.state.model.fields[index].clone());
-        let field = self.state.current_field.clone().unwrap();
+        let field = self.state.current_field.as_ref().unwrap();
         html! {
             <div class="model-field-editing">
                 <h3>{"Editing field: "}{&field.name}</h3>
@@ -227,7 +236,7 @@ impl App {
                 {"Label:"} <input type="text" value={&field.label} />
                 {"Placeholder:"} <input type="text" value={&field.placeholder} /><br/>
                 {"Required :"} <input type="checkbox" name="required" required={field.required} />
-                <button>{"cancel"}</button>
+                <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
                 <button>{"save"}</button>
             </div>
         }
