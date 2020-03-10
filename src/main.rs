@@ -5,6 +5,7 @@ extern crate serde;
 extern crate serde_json;
 
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::services::ConsoleService;
 use yew::html::InputData;
 mod form_model;
 pub use form_model::form_model::*;
@@ -21,7 +22,8 @@ struct EditingField {
 // TODO move into separated module
 struct App {
     link: ComponentLink<App>,
-    state: State
+    state: State,
+    console: ConsoleService,
 }
 
 pub struct State {
@@ -45,6 +47,7 @@ enum Msg {
     UpdateFieldName(String),
     UpdateFieldLabel(String),
     UpdateFieldPlaceHolder(String),
+    UpdateFieldType(FieldDataType),
     /*
 
 
@@ -55,7 +58,6 @@ enum Msg {
     RemoveField,
     DeleteField,
 
-    UpdateFieldType,
 
     NewListValue,
     CreateFieldValue,
@@ -90,6 +92,7 @@ impl Component for App {
         });
         App {
             link,
+            console: ConsoleService::new(),
             state: State { // TODO : create a builder for this
                 editing_field: None,
                 model: Model {
@@ -143,6 +146,7 @@ impl Component for App {
                 true
             }
             Msg::UpdateFieldName(name) => {
+                self.console.log("toto");
                 match &mut self.state.editing_field {
                     Some(editing_field) => editing_field.field.name = name,
                     None => ()
@@ -159,6 +163,14 @@ impl Component for App {
             Msg::UpdateFieldPlaceHolder(placeholder) => {
                 match &mut self.state.editing_field {
                     Some(editing_field) => editing_field.field.placeholder = placeholder,
+                    None => ()
+                };
+                true
+            }
+            Msg::UpdateFieldType(data_type) => {
+                self.console.log(&format!("data_type changed{:?}", data_type));
+                match &mut self.state.editing_field {
+                    Some(editing_field) => editing_field.field.data_type = data_type,
                     None => ()
                 };
                 true
@@ -292,9 +304,9 @@ impl App {
     }
 
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
-        // TODO onchange
+        // TODO onchange -> use select component see yew show case main.rs for examples
         html! {
-            <select>
+            <select onchange=self.link.callback(|selected| Msg::UpdateField)>
                 <option value="Text" selected={field_type == FieldDataType::Text}>{"Text"}</option>
                 <option value="Number">{"Number"}</option>
                 <option value="Phone">{"Phone"}</option>
