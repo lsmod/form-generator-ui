@@ -13,24 +13,25 @@ use crate::form_model::form_model::FieldDataType::*;
 mod react_native;
 pub use react_native::to_html_type;
 
+struct EditingField {
+    id: usize,
+    field: Field
+}
+
 // TODO move into separated module
 struct App {
     link: ComponentLink<App>,
     state: State
-    // state -> model -> fields
-    // state -> model -> WIPfield (to validate and be able to store no finished work)
 }
 
 pub struct State {
-    current_field_id: Option<usize>, // merge these two
-    current_field: Option<Field>, // merge these two into a single wrapper to avoid inconsistend state
+    editing_field: Option<EditingField>,
     model: Model,
 }
 // TODO:
-// - think about how I will retreive a specific field (id ?)
-// - think about when creating a field and all require param are not fullfieled
-
-
+// - think about validation...
+// - move into a separated module
+// - divide into sub Component (edit field, new field, header)
 enum Msg {
     UpdateName(String),
     UpdateTitle(String),
@@ -90,8 +91,7 @@ impl Component for App {
         App {
             link,
             state: State { // TODO : create a builder for this
-                current_field_id: None,
-                current_field: None,
+                editing_field: None,
                 model: Model {
                     name: "React-Native".to_string(),
                     title: Some("new title".to_string()),
@@ -122,43 +122,43 @@ impl Component for App {
                 true // TODO: return true only if new id != previous one ?
             }
             Msg::EditField(index) => {
-                self.state.current_field_id = Some(index);
-                self.state.current_field = Some(self.state.model.fields[index].clone());
+                self.state.editing_field = Some(EditingField {
+                    field: self.state.model.fields[index].clone(),
+                    id: index
+                });
                 true
             }
             Msg::CancelEditField => {
-                self.state.current_field_id = None;
-                self.state.current_field = None;
+                self.state.editing_field = None;
                 true
             }
             Msg::UpdateField => {
-                match self.state.current_field_id {
-                    Some(index) => {
-                        self.state.current_field_id = None;
-                        self.state.model.fields[index] = self.state.current_field.as_ref().unwrap().clone();
-                        self.state.current_field = None;
+                match &self.state.editing_field {
+                    Some(editing_field) => {
+                        self.state.model.fields[editing_field.id]  = editing_field.field.clone();
+                        self.state.editing_field = None;
                     }
                     None => ()
                 }
                 true
             }
             Msg::UpdateFieldName(name) => {
-                match &mut self.state.current_field {
-                    Some(field) => field.name = name,
+                match &mut self.state.editing_field {
+                    Some(editing_field) => editing_field.field.name = name,
                     None => ()
                 };
                 true
             }
             Msg::UpdateFieldLabel(label) => {
-                match &mut self.state.current_field {
-                    Some(field) => field.label = label,
+                match &mut self.state.editing_field {
+                    Some(editing_field) => editing_field.field.label = label,
                     None => ()
                 };
                 true
             }
             Msg::UpdateFieldPlaceHolder(placeholder) => {
-                match &mut self.state.current_field {
-                    Some(field) => field.placeholder = placeholder,
+                match &mut self.state.editing_field {
+                    Some(editing_field) => editing_field.field.placeholder = placeholder,
                     None => ()
                 };
                 true
@@ -169,10 +169,8 @@ impl Component for App {
     fn view(&self) -> Html {
         let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
         let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
+        let editing_view = self.view_editing_field();
 
-        let editing_view = if let Some(_editing_view) = self.state.current_field_id { self.view_editing_field() } else { html!{""} };
-
-        // TODO: add on change for input
         html! {
             <div>
                 <div class="model-header">
@@ -241,7 +239,7 @@ impl App {
             </li>
         }
     }
-
+    // TODO
     fn view_new_field(&self) -> Html {
         html! {
             <div class="model-field-creating">
@@ -251,48 +249,50 @@ impl App {
     }
 
     fn view_editing_field(&self) -> Html {
-        // TODO: this is the view who only got a &self ,
-        // modification are to be done in update that got a &mut self !!!
-        // TODO: add an action to display view field (toggle a state & copy field data)
-        let field = self.state.current_field.as_ref().unwrap();
-        html! {
-            <div class="model-field-editing">
-                <h3>{"Editing field: "}{&field.name}</h3>
-                {"Name:"}
-                <input
-                    type="text"
-                    value={&field.name}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldName(input.value)
-                        })
-                />
-                {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
-                {"Label:"}
-                <input
-                    type="text"
-                    value={&field.label}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldLabel(input.value)
-                        })
-                />
-                {"Placeholder:"} <input
-                    type="text"
-                    value={&field.placeholder}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldPlaceHolder(input.value)
-                        })
-                /><br/>
-                {"Required :"} <input type="checkbox" name="required" required={field.required} />
-                <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
-                <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
-            </div>
+        match &self.state.editing_field {
+            Some(editing_field) => {
+                let field = &editing_field.field;
+                html! {
+                <div class="model-field-editing">
+                    <h3>{"Editing field: "}{&field.name}</h3>
+                    {"Name:"}
+                    <input
+                        type="text"
+                        value={&field.name}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateFieldName(input.value)
+                            })
+                    />
+                    {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
+                    {"Label:"}
+                    <input
+                        type="text"
+                        value={&field.label}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateFieldLabel(input.value)
+                            })
+                    />
+                    {"Placeholder:"} <input
+                        type="text"
+                        value={&field.placeholder}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateFieldPlaceHolder(input.value)
+                            })
+                    /><br/>
+                    {"Required :"} <input type="checkbox" name="required" required={field.required} />
+                    <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
+                    <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
+                </div>
+            }},
+            None => html! {}
         }
     }
 
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
+        // TODO onchange
         html! {
             <select>
                 <option value="Text" selected={field_type == FieldDataType::Text}>{"Text"}</option>
