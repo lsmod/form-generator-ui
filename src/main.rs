@@ -307,9 +307,40 @@ impl App {
     }
     // TODO
     fn view_new_field(&self) -> Html {
+        let field = &state.creating_field.field;
         html! {
-            <div class="model-field-creating">
-                {"a new field"}
+            <div class="model-field-editing">
+                <h3>{"Editing field: "}{&field.name}</h3>
+                {"Name:"}
+                <input
+                    type="text"
+                    value={&field.name}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateNewFieldName(input.value)
+                        })
+                />
+                {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
+                {"Label:"}
+                <input
+                    type="text"
+                    value={&field.label}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateNewFieldLabel(input.value)
+                        })
+                />
+                {"Placeholder:"} <input
+                    type="text"
+                    value={&field.placeholder}
+                    oninput=self.link.callback(move |input: InputData|
+                        {
+                            Msg::UpdateNewFieldPlaceHolder(input.value)
+                        })
+                /><br/>
+                {"Required :"} <input type="checkbox" name="required" required={field.required} />
+                <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
+                <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
             </div>
         }
     }
@@ -357,6 +388,7 @@ impl App {
         }
     }
 
+    // TODO pass on update callback as a function (so it can be used by Edit & create)
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
         // TODO test it (it should work once depencies installed)
         html! {
