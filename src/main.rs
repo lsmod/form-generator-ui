@@ -5,6 +5,7 @@ extern crate serde;
 extern crate serde_json;
 
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::components::Select;
 use yew::services::ConsoleService;
 use yew::html::InputData;
 mod form_model;
@@ -28,10 +29,13 @@ struct App {
 
 pub struct State {
     editing_field: Option<EditingField>,
+    new_field: Field,
+    creating_field: Boolean,
     model: Model,
 }
 // TODO:
-// - think about validation...
+// - separator
+// - think about validation... -> create error Struct with message
 // - move into a separated module
 // - divide into sub Component (edit field, new field, header)
 enum Msg {
@@ -48,12 +52,17 @@ enum Msg {
     UpdateFieldLabel(String),
     UpdateFieldPlaceHolder(String),
     UpdateFieldType(FieldDataType),
-    /*
-
-
 
     NewField,
+    CancelNewField,
     CreateField,
+    UpdateNewFieldName(String),
+    UpdateNewFieldLabel(String),
+    UpdateNewFieldPlaceHolder(String),
+    UpdateNewFieldType(FieldDataType),
+    /*
+    MoveFieldUp
+    MoveFieldDown
 
     RemoveField,
     DeleteField,
@@ -95,6 +104,15 @@ impl Component for App {
             console: ConsoleService::new(),
             state: State { // TODO : create a builder for this
                 editing_field: None,
+                creating_field: false,
+                new_field: Field {
+                    name: "",
+                    data_type: FieldDataType::Text,
+                    label: "",
+                    placeholder: "",
+                    required: false,
+                    validation: None,
+                },
                 model: Model {
                     name: "React-Native".to_string(),
                     title: Some("new title".to_string()),
@@ -168,11 +186,47 @@ impl Component for App {
                 true
             }
             Msg::UpdateFieldType(data_type) => {
-                self.console.log(&format!("data_type changed{:?}", data_type));
                 match &mut self.state.editing_field {
                     Some(editing_field) => editing_field.field.data_type = data_type,
                     None => ()
                 };
+                true
+            }
+            Msg::NewField => {
+                self.state.creating_field = true
+                self.state.new_field = Field {
+                    name: "",
+                    data_type: FieldDataType::Text,
+                    label: "",
+                    placeholder: "",
+                    required: false,
+                    validation: None,
+                };
+                true
+            }
+            Msg::CancelNewField => {
+                self.state.creating_field = false;
+                true
+            }
+            Msg::CreateField => {
+                self.state.creating_field = false;
+                self.state.model.fields.push(self.state.creating_field.clone());
+                true;
+            }
+            Msg::UpdateNewFieldName(name) => {
+                self.state.new_field.name = name;
+                true
+            }
+            Msg::UpdateNewFieldLabel(label) => {
+                self.state.new_field.label = label;
+                true
+            }
+            Msg::UpdateNewFieldPlaceHolder(placeholder) => {
+                self.state.new_field.placeholder = placeholder;
+                true
+            }
+            Msg::UpdateNewFieldType(data_type) => {
+                self.state.new_field.data_type = data_type;
                 true
             }
         }
@@ -304,13 +358,12 @@ impl App {
     }
 
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
-        // TODO onchange -> use select component see yew show case main.rs for examples
+        // TODO test it (it should work once depencies installed)
         html! {
-            <select onchange=self.link.callback(|selected| Msg::UpdateField)>
-                <option value="Text" selected={field_type == FieldDataType::Text}>{"Text"}</option>
-                <option value="Number">{"Number"}</option>
-                <option value="Phone">{"Phone"}</option>
-            </select>
+            <Select<FieldDataType>
+                selected=Some(field_type)
+                options=FieldDataType::iter().collect::<Vec<_>>()
+                onchange=self.link.callback(Msg::UpdateFieldType) />
         }
     }
 }

@@ -1,3 +1,5 @@
+use strum_macros::{Display, EnumIter, EnumString};
+
 pub mod form_model {
     #[derive(Deserialize, Debug, Clone)]
     pub struct Model {
@@ -15,7 +17,7 @@ pub mod form_model {
         pub enum_values: Option<Vec<String>>,
     }
 
-    #[derive(PartialEq, Deserialize, Debug, Clone)]
+    #[derive(Deserialize, Debug, Clone, Display, EnumString, EnumIter, PartialEq)]
     pub enum FieldDataType {
         Text,
         Email,
