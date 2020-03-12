@@ -281,9 +281,9 @@ impl Component for App {
                             }) value={&self.state.model.submit_label} />
                         </div>
                     </div>
-                    <button>{"New field"}</button>
+                    <button onclick=self.link.callback(|_| Msg::NewField)>{"New field"}</button>
                     { editing_view }
-                    { creating_view }
+                    { creating_view}
                     <div class="model-field-container">
                         <ul>
                         { for self.state.model.fields.iter().enumerate().map(|(index, field)| self.view_field(index, field)) }
@@ -315,41 +315,46 @@ impl App {
     // TODO update required value
     fn view_new_field(&self) -> Html {
         let field = &self.state.new_field;
-        html! {
-            <div class="model-field-editing">
-                <h3>{"New field: "}{&field.name}</h3>
-                {"Name:"}
-                <input
-                    type="text"
-                    value={&field.name}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateNewFieldName(input.value)
-                        })
-                />
+        if self.state.creating_field {
+            html! {
+                <div class="model-field-editing">
+                    <h3>{"New field: "}{&field.name}</h3>
+                    {"Name:"}
+                    <input
+                        type="text"
+                        value={&field.name}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateNewFieldName(input.value)
+                            })
+                    />
 
-                {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
-                {"Label:"}
-                <input
-                    type="text"
-                    value={&field.label}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateNewFieldLabel(input.value)
-                        })
-                />
-                {"Placeholder:"} <input
-                    type="text"
-                    value={&field.placeholder}
-                    oninput=self.link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateNewFieldPlaceHolder(input.value)
-                        })
-                /><br/>
-                {"Required :"} <input type="checkbox" name="required" required={field.required} />
-                <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
-                <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
-            </div>
+                    {"Type:"} {self.view_select_type(field.data_type.clone(), true)}<br/>
+                    {"Label:"}
+                    <input
+                        type="text"
+                        value={&field.label}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateNewFieldLabel(input.value)
+                            })
+                    />
+                    {"Placeholder:"} <input
+                        type="text"
+                        value={&field.placeholder}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateNewFieldPlaceHolder(input.value)
+                            })
+                    /><br/>
+                    {"Required :"} <input type="checkbox" name="required" required={field.required} />
+                    <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
+                    <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
+                </div>
+            }
+        }
+        else {
+            html!{}
         }
     }
 
@@ -370,7 +375,7 @@ impl App {
                                 Msg::UpdateFieldName(input.value)
                             })
                     />
-                    {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
+                    {"Type:"} {self.view_select_type(field.data_type.clone(), false)}<br/>
                     {"Label:"}
                     <input
                         type="text"
@@ -398,12 +403,13 @@ impl App {
     }
 
     // TODO pass on update callback as a function (so it can be used by Edit & create
-    fn view_select_type(&self, field_type: FieldDataType) -> Html {
+    fn view_select_type(&self, field_type: FieldDataType, creation_mode: bool) -> Html {
+        let callback = if creation_mode { Msg::UpdateNewFieldType } else { Msg::UpdateFieldType};
         html! {
             <Select<FieldDataType>
                 selected=Some(field_type)
                 options=FieldDataType::iter().collect::<Vec<_>>()
-                onchange=self.link.callback(Msg::UpdateFieldType) />
+                onchange=self.link.callback(callback) />
         }
     }
 }
