@@ -1,6 +1,3 @@
-
-
-
 pub mod form_model {
     #[derive(Deserialize, Debug, Clone)]
     pub struct Model {

@@ -7,16 +7,15 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
-use crate::strum::IntoEnumIterator;
+use strum::IntoEnumIterator;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew::components::Select;
 use yew::services::ConsoleService;
 use yew::html::InputData;
+
 mod form_model;
 pub use form_model::form_model::*;
-use crate::form_model::form_model::FieldDataType::*;
-
-
+pub use form_model::form_model::FieldDataType::*;
 mod react_native;
 pub use react_native::to_html_type;
 
@@ -400,7 +399,6 @@ impl App {
 
     // TODO pass on update callback as a function (so it can be used by Edit & create
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
-        // TODO test it (it should work once depencies installed)
         html! {
             <Select<FieldDataType>
                 selected=Some(field_type)
