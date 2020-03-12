@@ -56,6 +56,7 @@ enum Msg {
     UpdateFieldLabel(String),
     UpdateFieldPlaceHolder(String),
     UpdateFieldType(FieldDataType),
+    ToggleFieldRequired,
 
     NewField,
     CancelNewField,
@@ -64,6 +65,7 @@ enum Msg {
     UpdateNewFieldLabel(String),
     UpdateNewFieldPlaceHolder(String),
     UpdateNewFieldType(FieldDataType),
+    ToggleNewFieldRequired,
     /*
     MoveFieldUp
     MoveFieldDown
@@ -196,6 +198,13 @@ impl Component for App {
                 };
                 true
             }
+            Msg::ToggleFieldRequired => {
+                match &mut self.state.editing_field {
+                    Some(editing_field) => editing_field.field.required = !editing_field.field.required,
+                    None => ()
+                };
+                true
+            }
             Msg::NewField => {
                 self.state.creating_field = true;
                 self.state.new_field = Field {
@@ -233,6 +242,10 @@ impl Component for App {
                 self.state.new_field.data_type = data_type;
                 true
             }
+            Msg::ToggleNewFieldRequired => {
+                self.state.new_field.required = !self.state.new_field.required;
+                true
+            }
         }
     }
 
@@ -240,7 +253,7 @@ impl Component for App {
         let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
         let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
         let editing_view = self.view_editing_field();
-        let creating_view = self.view_new_field(); // TODO only display when needed
+        let creating_view = self.view_new_field();
         html! {
             <div>
                 <div class="model-header">
@@ -310,9 +323,7 @@ impl App {
             </li>
         }
     }
-    // TODO make it change the new field no the editing_field
-    // TODO dismiss view
-    // TODO update required value
+
     fn view_new_field(&self) -> Html {
         let field = &self.state.new_field;
         if self.state.creating_field {
@@ -347,7 +358,7 @@ impl App {
                                 Msg::UpdateNewFieldPlaceHolder(input.value)
                             })
                     /><br/>
-                    {"Required :"} <input type="checkbox" name="required" required={field.required} />
+                    {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleNewFieldRequired) name="required" checked=field.required />
                     <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
                     <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
                 </div>
@@ -358,7 +369,6 @@ impl App {
         }
     }
 
-    // TODO update required value
     fn view_editing_field(&self) -> Html {
         match &self.state.editing_field {
             Some(editing_field) => {
@@ -393,7 +403,7 @@ impl App {
                                 Msg::UpdateFieldPlaceHolder(input.value)
                             })
                     /><br/>
-                    {"Required :"} <input type="checkbox" name="required" required={field.required} />
+                    {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleFieldRequired) name="required" checked=field.required />
                     <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
                     <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
                 </div>
