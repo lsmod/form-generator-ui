@@ -1,12 +1,13 @@
 #![recursion_limit="512"]
+extern crate strum;
+#[macro_use]
+extern crate strum_macros;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
-extern crate strum;
-#[macro_use]
-extern crate strum_macros;
 
+use crate::strum::IntoEnumIterator;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew::components::Select;
 use yew::services::ConsoleService;
@@ -240,7 +241,7 @@ impl Component for App {
         let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
         let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
         let editing_view = self.view_editing_field();
-
+        let creating_view = self.view_new_field(); // TODO only display when needed
         html! {
             <div>
                 <div class="model-header">
@@ -283,6 +284,7 @@ impl Component for App {
                     </div>
                     <button>{"New field"}</button>
                     { editing_view }
+                    { creating_view }
                     <div class="model-field-container">
                         <ul>
                         { for self.state.model.fields.iter().enumerate().map(|(index, field)| self.view_field(index, field)) }
@@ -309,12 +311,14 @@ impl App {
             </li>
         }
     }
-    // TODO
+    // TODO make it change the new field no the editing_field
+    // TODO dismiss view
+    // TODO update required value
     fn view_new_field(&self) -> Html {
         let field = &self.state.new_field;
         html! {
             <div class="model-field-editing">
-                <h3>{"Editing field: "}{&field.name}</h3>
+                <h3>{"New field: "}{&field.name}</h3>
                 {"Name:"}
                 <input
                     type="text"
@@ -324,6 +328,7 @@ impl App {
                             Msg::UpdateNewFieldName(input.value)
                         })
                 />
+
                 {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
                 {"Label:"}
                 <input
@@ -349,6 +354,7 @@ impl App {
         }
     }
 
+    // TODO update required value
     fn view_editing_field(&self) -> Html {
         match &self.state.editing_field {
             Some(editing_field) => {
@@ -392,7 +398,7 @@ impl App {
         }
     }
 
-    // TODO pass on update callback as a function (so it can be used by Edit & create)
+    // TODO pass on update callback as a function (so it can be used by Edit & create
     fn view_select_type(&self, field_type: FieldDataType) -> Html {
         // TODO test it (it should work once depencies installed)
         html! {
