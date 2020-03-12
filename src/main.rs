@@ -3,6 +3,9 @@
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
+extern crate strum;
+#[macro_use]
+extern crate strum_macros;
 
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew::components::Select;
@@ -11,6 +14,7 @@ use yew::html::InputData;
 mod form_model;
 pub use form_model::form_model::*;
 use crate::form_model::form_model::FieldDataType::*;
+
 
 mod react_native;
 pub use react_native::to_html_type;
@@ -30,7 +34,7 @@ struct App {
 pub struct State {
     editing_field: Option<EditingField>,
     new_field: Field,
-    creating_field: Boolean,
+    creating_field: bool,
     model: Model,
 }
 // TODO:
@@ -106,10 +110,10 @@ impl Component for App {
                 editing_field: None,
                 creating_field: false,
                 new_field: Field {
-                    name: "",
+                    name: "".to_string(),
                     data_type: FieldDataType::Text,
-                    label: "",
-                    placeholder: "",
+                    label: "".to_string(),
+                    placeholder: "".to_string(),
                     required: false,
                     validation: None,
                 },
@@ -193,12 +197,12 @@ impl Component for App {
                 true
             }
             Msg::NewField => {
-                self.state.creating_field = true
+                self.state.creating_field = true;
                 self.state.new_field = Field {
-                    name: "",
+                    name: "".to_string(),
                     data_type: FieldDataType::Text,
-                    label: "",
-                    placeholder: "",
+                    label: "".to_string(),
+                    placeholder: "".to_string(),
                     required: false,
                     validation: None,
                 };
@@ -210,8 +214,8 @@ impl Component for App {
             }
             Msg::CreateField => {
                 self.state.creating_field = false;
-                self.state.model.fields.push(self.state.creating_field.clone());
-                true;
+                self.state.model.fields.push(self.state.new_field.clone());
+                true
             }
             Msg::UpdateNewFieldName(name) => {
                 self.state.new_field.name = name;
@@ -307,7 +311,7 @@ impl App {
     }
     // TODO
     fn view_new_field(&self) -> Html {
-        let field = &state.creating_field.field;
+        let field = &self.state.new_field;
         html! {
             <div class="model-field-editing">
                 <h3>{"Editing field: "}{&field.name}</h3>
