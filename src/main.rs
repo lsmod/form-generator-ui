@@ -39,6 +39,9 @@ pub struct State {
 }
 // TODO:
 // - separator
+// - handle list, radio, (anything with multiple value possible)
+// - ? field with vec of value ? vec of value as separated field properties
+// - ? validation with a list of possible values ?
 // - think about validation... -> create error Struct with message
 // - move into a separated module
 // - divide into sub Component (edit field, new field, header)
