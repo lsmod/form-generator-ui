@@ -9,10 +9,16 @@ pub mod form_model {
     }
 
     #[derive(Deserialize, Debug, Clone)]
+    pub struct EnumValues {
+        pub value: String,
+        pub label: String,
+    }
+    
+    #[derive(Deserialize, Debug, Clone)]
     pub struct Validation {
         pub min_length: Option<u8>,
         pub max_length: Option<u8>,
-        pub enum_values: Option<Vec<String>>,
+        pub enum_values: Option<Vec<EnumValues>>,
     }
 
     #[derive(Deserialize, Debug, Clone, EnumIter, EnumString, PartialEq)]

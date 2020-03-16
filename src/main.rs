@@ -39,10 +39,17 @@ pub struct State {
 }
 // TODO:
 // - separator
+
 // - handle list, radio, (anything with multiple value possible)
-// - ? field with vec of value ? vec of value as separated field properties
-// - ? validation with a list of possible values ?
-// - think about validation... -> create error Struct with message
+// -> use validation -> enum_values
+// -> display a list with add/edit/remove/move up/move down
+// -> enum_values should be a tuple of string: 1 value 2 the label
+
+// - think about validation...
+// -> create error Struct with message
+// -> call validation before exporting (look for all empty string)
+
+// - camelCase, snake_case
 // - move into a separated module
 // - divide into sub Component (edit field, new field, header)
 enum Msg {
@@ -60,6 +67,10 @@ enum Msg {
     UpdateFieldPlaceHolder(String),
     UpdateFieldType(FieldDataType),
     ToggleFieldRequired,
+    UpdateFieldEnumValueValue(String),
+    UpdateFieldEnumValueLabel(String),
+    DeleteFieldEnumValue(),
+    NewFieldEnumValue(), // add a new enumvalue -> value "", label "" -> ""
 
     NewField,
     CancelNewField,
@@ -69,6 +80,10 @@ enum Msg {
     UpdateNewFieldPlaceHolder(String),
     UpdateNewFieldType(FieldDataType),
     ToggleNewFieldRequired,
+    UpdateNewFieldEnumValueValue(String),
+    UpdateNewFieldEnumValueLabel(String),
+    DeleteNewFieldEnumValue(),
+    NewNewFieldEnumValue(),
     /*
     MoveFieldUp
     MoveFieldDown
