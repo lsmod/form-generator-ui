@@ -22,6 +22,7 @@ pub use react_native::to_html_type;
 struct EditingField {
     id: usize,
     field: Field
+    // TODO add information about enum value (current index, creating_new?)
 }
 
 // TODO move into separated module
@@ -33,8 +34,8 @@ struct App {
 
 pub struct State {
     editing_field: Option<EditingField>,
-    new_field: Field,
-    creating_field: bool,
+    new_field: Field, // TODO move this inside it's own struct
+    creating_field: bool, // TODO move this inside it's own struct
     model: Model,
 }
 // TODO:
@@ -80,9 +81,9 @@ enum Msg {
     UpdateNewFieldPlaceHolder(String),
     UpdateNewFieldType(FieldDataType),
     ToggleNewFieldRequired,
-    UpdateNewFieldEnumValueValue(String),
-    UpdateNewFieldEnumValueLabel(String),
-    DeleteNewFieldEnumValue(),
+    UpdateNewFieldEnumValueValue(usize, String),
+    UpdateNewFieldEnumValueLabel(usize, String),
+    DeleteNewFieldEnumValue(usize),
     NewNewFieldEnumValue(),
     /*
     MoveFieldUp
@@ -262,6 +263,57 @@ impl Component for App {
             }
             Msg::ToggleNewFieldRequired => {
                 self.state.new_field.required = !self.state.new_field.required;
+                true
+            }
+            Msg::UpdateNewFieldEnumValueValue(index, value) => {
+                match &mut self.state.new_field.validation {
+                    Some(validation) => {
+                        match &mut validation.enum_values {
+                            Some(values) => {
+                                values[index] = EnumValues {
+                                    value: value,
+                                    label: values[index].value.clone()
+                                }
+                            },
+                            None => ()
+                        }
+                    },
+                    None => ()
+                };
+                true
+            }
+            Msg::UpdateNewFieldEnumValueLabel(index, label) => {
+                match &mut self.state.new_field.validation {
+                    Some(validation) => {
+                        match &mut validation.enum_values {
+                            Some(values) => {
+                                values[index] = EnumValues {
+                                    label: label,
+                                    value: values[index].value.clone()
+                                };
+                            },
+                            None => ()
+                        }
+                    },
+                    None => ()
+                };
+                true
+            }
+            Msg::DeleteNewFieldEnumValue(index) => {
+                match &mut self.state.new_field.validation {
+                    Some(validation) => {
+                        match &mut validation.enum_values {
+                            Some(values) => {
+                                values.remove(index);
+                            },
+                            None => ()
+                        }
+                    },
+                    None => ()
+                };
+                true
+            }
+            Msg::NewNewFieldEnumValue() => {
                 true
             }
         }
