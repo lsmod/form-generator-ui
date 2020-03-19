@@ -338,6 +338,35 @@ impl Component for App {
                 true
             }
             Msg::CreateNewEnumValue  => {
+                // TODO match on self.state.creating_enum_value
+                match &mut self.state.editing_field {
+                    Some(editing_field) => { // we are editing a field
+                        match &mut editing_field.field.validation {
+                            Some(validation) => { // there is validation
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {
+                                        match &mut self.state.editing_enum_value {
+                                            Some(editing_enum_value) => { // we are also editing an enum value
+                                                enum_values.push(editing_enum_value.enum_value.clone())
+                                            },
+                                            None => ()
+                                        }
+                                    },
+                                    None => ()
+                                }
+                            },
+                            None => {
+                                editing_field.field.validation = Some(Validation{
+                                    min_length: None,
+                                    max_length: None,
+                                    enum_values: Some(vec![self.state.creating_enum_value])
+                                });
+                                ()
+                            } // TODO add validation
+                        }
+                    },
+                    None => () // TODO check if we are creating a field
+                }
                 // TODO check if we are editing or creating
                 // TODO check if field has validation ? create empty vec
                 // TODO add validation to field
@@ -366,8 +395,6 @@ impl Component for App {
                     },
                     None => ()
                 }
-                // TODO check if field has validation ? none -> do nothing
-                // TODO replace old enum field with editing_enum_value (using EditingEnumValue.index)
                 true
             }
             Msg::DeleteEnumValue(index) => {
