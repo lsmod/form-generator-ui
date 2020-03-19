@@ -345,6 +345,27 @@ impl Component for App {
                 true
             }
             Msg::UpdateFieldEnumValues => {
+                match &mut self.state.editing_field {
+                    Some(editing_field) => { // we are editing a field
+                        match &mut editing_field.field.validation {
+                            Some(validation) => { // there is validation
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {
+                                        match &mut self.state.editing_enum_value {
+                                            Some(editing_enum_value) => { // we are also editing an enum value
+                                                enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone()
+                                            },
+                                            None => ()
+                                        }
+                                    },
+                                    None => ()
+                                }
+                            },
+                            None => ()
+                        }
+                    },
+                    None => ()
+                }
                 // TODO check if field has validation ? none -> do nothing
                 // TODO replace old enum field with editing_enum_value (using EditingEnumValue.index)
                 true
