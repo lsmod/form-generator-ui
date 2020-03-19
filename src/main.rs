@@ -338,39 +338,54 @@ impl Component for App {
                 true
             }
             Msg::CreateNewEnumValue  => {
-                // TODO match on self.state.creating_enum_value
-                match &mut self.state.editing_field {
-                    Some(editing_field) => { // we are editing a field
-                        match &mut editing_field.field.validation {
-                            Some(validation) => { // there is validation
-                                match &mut validation.enum_values {
-                                    Some(enum_values) => {
-                                        match &mut self.state.editing_enum_value {
-                                            Some(editing_enum_value) => { // we are also editing an enum value
-                                                enum_values.push(editing_enum_value.enum_value.clone())
+                match &mut self.state.creating_enum_value {
+                    Some(creating_enum_value) => {
+                        match &mut self.state.editing_field {
+                            Some(editing_field) => { // we are editing a field
+                                match &mut editing_field.field.validation {
+                                    Some(validation) => { // there is validation
+                                        match &mut validation.enum_values {
+                                            Some(enum_values) => {
+                                                enum_values.push(creating_enum_value.clone())
                                             },
                                             None => ()
                                         }
                                     },
-                                    None => ()
+                                    None => {
+                                        editing_field.field.validation = Some(Validation{
+                                            min_length: None,
+                                            max_length: None,
+                                            enum_values: Some(vec![creating_enum_value.clone()])
+                                        });
+                                        ()
+                                    }
                                 }
                             },
                             None => {
-                                editing_field.field.validation = Some(Validation{
-                                    min_length: None,
-                                    max_length: None,
-                                    enum_values: Some(vec![self.state.creating_enum_value])
-                                });
-                                ()
-                            } // TODO add validation
+                                if self.state.creating_field { // we are creating a new field
+                                    match &mut self.state.new_field.validation {
+                                        Some(validation) => { // there is validation
+                                            match &mut validation.enum_values {
+                                                Some(enum_values) => enum_values.push(creating_enum_value.clone()),
+                                                None => { // there is no enum_values in validation
+                                                    validation.enum_values = Some(vec![creating_enum_value.clone()])
+                                                }
+                                            }
+                                        },
+                                        None => { // no validation ? let's add some
+                                            self.state.new_field.validation = Some(Validation {
+                                                min_length: None,
+                                                max_length: None,
+                                                enum_values: Some(vec![creating_enum_value.clone()])
+                                            });
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
-                    None => () // TODO check if we are creating a field
+                    None => ()
                 }
-                // TODO check if we are editing or creating
-                // TODO check if field has validation ? create empty vec
-                // TODO add validation to field
-                // TODO add corresponding enum value
                 true
             }
             Msg::UpdateFieldEnumValues => {
