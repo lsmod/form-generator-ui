@@ -378,6 +378,7 @@ impl Component for App {
                                                 max_length: None,
                                                 enum_values: Some(vec![creating_enum_value.clone()])
                                             });
+                                            self.state.creating_enum_value = None;
                                         }
                                     }
                                 }
@@ -547,9 +548,56 @@ impl App {
         }
     }
 
+    fn view_creating_enum_values(&self) -> Html {
+        match &self.state.creating_enum_value {
+            Some(creating_enum_value) => html!{
+                <div>
+                    {"creating enum"}
+                    {"Label:"}
+                    <input
+                        type="text"
+                        value={&creating_enum_value.label}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateEnumValueLabel(input.value)
+                            })
+                    />
+                    {"Value:"}
+                    <input
+                        type="text"
+                        value={&creating_enum_value.value}
+                        oninput=self.link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateEnumValueValue(input.value)
+                            })
+                    />
+                    <button onclick=self.link.callback(|_| Msg::CreateNewEnumValue)>
+                        {"add"}
+                    </button>
+                </div>
+            },
+            None => html!{}
+        }
+    }
+
     fn view_new_field(&self) -> Html {
         let field = &self.state.new_field;
+
         if self.state.creating_field {
+            let creating_enum_values_view = self.view_creating_enum_values();
+            let create_enum_btn = match self.state.new_field.data_type {
+                Radio => {
+                    match self.state.creating_enum_value {
+                        Some(_) => html!{},
+                        None => html!{
+                            <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
+                                {"create enum values"}
+                            </button>
+                        },
+                    }
+                }
+                _ => html!{}
+            };
             html! {
                 <div class="model-field-editing">
                     <h3>{"New field: "}{&field.name}</h3>
@@ -584,6 +632,8 @@ impl App {
                     {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleNewFieldRequired) name="required" checked=field.required />
                     <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
                     <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
+                    <br/>{creating_enum_values_view}
+                    {create_enum_btn}
                 </div>
             }
         }
