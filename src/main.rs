@@ -481,6 +481,17 @@ impl Component for App {
                 // TODO check if we are editing or creating
                 // TODO check if field has validation ? none -> do nothing
                 // TODO if validation .length = 0 valdiation = None
+                if self.state.creating_field {
+                    match &mut self.state.new_field.validation {
+                        Some(validation) => {
+                            match &mut validation.enum_values {
+                                Some(enum_values) => {enum_values.remove(index);},
+                                None => ()
+                            }
+                        }
+                        None => (),
+                    }
+                }
                 true
             }
         }
@@ -600,6 +611,7 @@ impl App {
                                 <div>
                                     <div>{"value: "}{&enum_value.value}</div>
                                     <div>{"label: "}{&enum_value.label}</div>
+                                    <button onclick=self.link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
                                     <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
                                 </div>
                             } )}
