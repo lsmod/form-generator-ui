@@ -492,6 +492,22 @@ impl Component for App {
                         None => (),
                     }
                 }
+                else {
+                    match &mut self.state.editing_field {
+                        Some(editing_field) => {
+                            match &mut editing_field.field.validation {
+                                Some(validation) => {
+                                    match &mut validation.enum_values {
+                                        Some(enum_values) => {enum_values.remove(index);},
+                                        None => ()
+                                    }
+                                },
+                                None => ()
+                            }
+                        },
+                        None => ()
+                    }
+                }
                 true
             }
         }
@@ -585,6 +601,7 @@ impl App {
                                             Msg::UpdateEnumValueValue(input.value)
                                         })
                             value={&editing_enum_value.enum_value.value} />
+                            {"label: "}
                             <input type="text"
                                 name="label_enum_value"
                                 oninput=self.link.callback(move |input: InputData|
@@ -601,36 +618,73 @@ impl App {
         }
     }
     fn view_enum_values_list(&self) -> Html {
-        let fields = match &self.state.new_field.validation {
-            Some(validation) => {
-                match &validation.enum_values {
-                    Some(enum_values) => {
-                        html! {
-                            <ul>
-                            { for enum_values.iter().enumerate().map(|(index, enum_value)| html!{
-                                <div>
-                                    <div>{"value: "}{&enum_value.value}</div>
-                                    <div>{"label: "}{&enum_value.label}</div>
-                                    <button onclick=self.link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
-                                    <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
-                                </div>
-                            } )}
-                            </ul>
-                        }
-                    },
-                    None => html!{}
-                }
-            },
-            None => html!{}
-        };
-        html!{
-            <div>
-                <h3>{"Enum values"}</h3>
-                {self.view_editing_enum_value()}
-                {fields}
-            </div>
+        if self.state.creating_field {
+            let fields = match &self.state.new_field.validation {
+                Some(validation) => {
+                    match &validation.enum_values {
+                        Some(enum_values) => {
+                            html! {
+                                <ul>
+                                { for enum_values.iter().enumerate().map(|(index, enum_value)| html!{
+                                    <div>
+                                        <div>{"value: "}{&enum_value.value}</div>
+                                        <div>{"label: "}{&enum_value.label}</div>
+                                        <button onclick=self.link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
+                                        <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
+                                    </div>
+                                } )}
+                                </ul>
+                            }
+                        },
+                        None => html!{}
+                    }
+                },
+                None => html!{}
+            };
+            html!{
+                <div>
+                    <h3>{"Enum values"}</h3>
+                    {self.view_editing_enum_value()}
+                    {fields}
+                </div>
+            }
+        }
+        else {
+            match &self.state.editing_field {
+                Some(editing_field) => {
+                    let fields = match &editing_field.field.validation {
+                        Some(validation) => {
+                            match &validation.enum_values {
+                                Some(enum_values) => html!{
+                                    <ul>
+                                    { for enum_values.iter().enumerate().map(|(index, enum_value)| html!{
+                                        <div>
+                                            <div>{"value: "}{&enum_value.value}</div>
+                                            <div>{"label: "}{&enum_value.label}</div>
+                                            <button onclick=self.link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
+                                            <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
+                                        </div>
+                                    } )}
+                                    </ul>
+                                },
+                                None => html!{}
+                            }
+                        },
+                        None => html!{}
+                    };
+                    html!{
+                        <div>
+                            <h3>{"Enum values"}</h3>
+                            {self.view_editing_enum_value()}
+                            {fields}
+                        </div>
+                    }
+                },
+                None => html!{}
+            }
         }
     }
+
     fn view_creating_enum_values(&self) -> Html {
         match &self.state.creating_enum_value {
             Some(creating_enum_value) => html!{
@@ -733,6 +787,23 @@ impl App {
         match &self.state.editing_field {
             Some(editing_field) => {
                 let field = &editing_field.field;
+                let creating_enum_values_view = self.view_creating_enum_values();
+                let create_enum_btn = match editing_field.field.data_type {
+                    Radio => {
+                        match self.state.creating_enum_value {
+                            Some(_) => html!{{self.view_enum_values_list()}},
+                            None => html!{
+                                <div>
+                                    <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
+                                        {"create enum values"}
+                                    </button>
+                                    {self.view_enum_values_list()}
+                                </div>
+                            },
+                        }
+                    }
+                    _ => html!{}
+                };
                 html! {
                 <div class="model-field-editing">
                     <h3>{"Editing field: "}{&field.name}</h3>
@@ -766,6 +837,8 @@ impl App {
                     {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleFieldRequired) name="required" checked=field.required />
                     <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
                     <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
+                    <br/>{creating_enum_values_view}
+                    {create_enum_btn}
                 </div>
             }},
             None => html! {}
