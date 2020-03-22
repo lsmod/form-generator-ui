@@ -19,11 +19,13 @@ pub use form_model::form_model::FieldDataType::*;
 mod react_native;
 pub use react_native::to_html_type;
 
+#[derive(Debug)]
 struct EditingEnumValue {
     index: usize,
     enum_value: EnumValues,
 }
 
+#[derive(Debug)]
 struct EditingField {
     id: usize,
     field: Field
@@ -36,6 +38,7 @@ struct App {
     console: ConsoleService,
 }
 
+#[derive(Debug)]
 pub struct State {
     editing_field: Option<EditingField>,
     editing_enum_value: Option<EditingEnumValue>,
@@ -280,14 +283,49 @@ impl Component for App {
                 true
             }
             Msg::EditFieldEnumValues(index) => {
-                // TODO: check if editing_field got validation -> create it otherwise
-                self.state.editing_enum_value = Some(EditingEnumValue {
-                    index: index,
-                    enum_value: EnumValues {
-                        value: "".to_string(), // TODO get that value form current field
-                        label: "".to_string(),
-                    },
-                });
+                if self.state.creating_field {
+                    match &self.state.new_field.validation {
+                        Some(validation) => {
+                            match &validation.enum_values {
+                                Some(enum_values) => {
+                                    self.state.editing_enum_value = Some(EditingEnumValue {
+                                        index: index,
+                                        enum_value: EnumValues {
+                                            value: enum_values[index].value.to_string(), // TODO get that value form current field
+                                            label: enum_values[index].label.to_string(),
+                                        },
+                                    });
+                                },
+                                None => (),
+                            }
+                        },
+                        None => ()
+                    }
+                } else {
+                    match &self.state.editing_field {
+                        Some(editing_field) => {
+                            match &editing_field.field.validation {
+                                Some(validation) => {
+                                    match &validation.enum_values {
+                                        Some(enum_values) => {
+                                            self.state.editing_enum_value = Some(EditingEnumValue {
+                                                index: index,
+                                                enum_value: EnumValues {
+                                                    value: enum_values[index].value.to_string(), // TODO get that value form current field
+                                                    label: enum_values[index].label.to_string(),
+                                                },
+                                            });
+                                        },
+                                        None => (),
+                                    }
+                                },
+                                None => ()
+                            }
+                        }
+                        None => ()
+                    }
+                }
+                self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::CancelEditEnumValues => {
@@ -346,7 +384,8 @@ impl Component for App {
                                     Some(validation) => { // there is validation
                                         match &mut validation.enum_values {
                                             Some(enum_values) => {
-                                                enum_values.push(creating_enum_value.clone())
+                                                enum_values.push(creating_enum_value.clone());
+                                                self.state.creating_enum_value = None;
                                             },
                                             None => ()
                                         }
@@ -368,7 +407,8 @@ impl Component for App {
                                             match &mut validation.enum_values {
                                                 Some(enum_values) => enum_values.push(creating_enum_value.clone()),
                                                 None => { // there is no enum_values in validation
-                                                    validation.enum_values = Some(vec![creating_enum_value.clone()])
+                                                    validation.enum_values = Some(vec![creating_enum_value.clone()]);
+
                                                 }
                                             }
                                         },
@@ -387,6 +427,8 @@ impl Component for App {
                     },
                     None => ()
                 }
+                self.state.creating_enum_value = None;
+                self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::UpdateFieldEnumValues => {
@@ -409,8 +451,30 @@ impl Component for App {
                             None => ()
                         }
                     },
-                    None => ()
+                    None => {
+                        if self.state.creating_field {
+                            match &mut self.state.editing_enum_value {
+                                Some(editing_enum_value) => {
+                                    match &mut self.state.new_field.validation {
+                                        Some(validation) => {
+                                            match &mut validation.enum_values {
+                                                Some(enum_values) => {
+                                                    enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone();
+                                                },
+                                                None => ()
+                                            }
+                                        },
+                                        None => ()
+                                    }
+                                },
+                                None => ()
+                            }
+                        }
+                        ()
+                    }
                 }
+                self.state.editing_enum_value = None;
+                self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::DeleteEnumValue(index) => {
@@ -419,57 +483,6 @@ impl Component for App {
                 // TODO if validation .length = 0 valdiation = None
                 true
             }
-            // Msg::UpdateNewFieldEnumValueValue(index, value) => {
-            //     match &mut self.state.new_field.validation {
-            //         Some(validation) => {
-            //             match &mut validation.enum_values {
-            //                 Some(values) => {
-            //                     values[index] = EnumValues {
-            //                         value: value,
-            //                         label: values[index].value.clone()
-            //                     }
-            //                 },
-            //                 None => ()
-            //             }
-            //         },
-            //         None => ()
-            //     };
-            //     true
-            // }
-            // Msg::UpdateNewFieldEnumValueLabel(index, label) => {
-            //     match &mut self.state.new_field.validation {
-            //         Some(validation) => {
-            //             match &mut validation.enum_values {
-            //                 Some(values) => {
-            //                     values[index] = EnumValues {
-            //                         label: label,
-            //                         value: values[index].value.clone()
-            //                     };
-            //                 },
-            //                 None => ()
-            //             }
-            //         },
-            //         None => ()
-            //     };
-            //     true
-            // }
-            // Msg::DeleteNewFieldEnumValue(index) => {
-            //     match &mut self.state.new_field.validation {
-            //         Some(validation) => {
-            //             match &mut validation.enum_values {
-            //                 Some(values) => {
-            //                     values.remove(index);
-            //                 },
-            //                 None => ()
-            //             }
-            //         },
-            //         None => ()
-            //     };
-            //     true
-            // }
-            // Msg::NewNewFieldEnumValue() => {
-            //     true
-            // }
         }
     }
 
@@ -548,6 +561,64 @@ impl App {
         }
     }
 
+    fn view_editing_enum_value(&self) -> Html {
+        match &self.state.editing_enum_value {
+            Some(editing_enum_value) => {
+                html!{
+                    <div>
+                        {"Editing Enum value: "}
+                        <input type="text"
+                            name="value_enum_value"
+                            oninput=self.link.callback(move |input: InputData|
+                                        {
+                                            Msg::UpdateEnumValueValue(input.value)
+                                        })
+                            value={&editing_enum_value.enum_value.value} />
+                            <input type="text"
+                                name="label_enum_value"
+                                oninput=self.link.callback(move |input: InputData|
+                                            {
+                                                Msg::UpdateEnumValueLabel(input.value)
+                                            })
+                                value={&editing_enum_value.enum_value.label} />
+                                <button onclick=self.link.callback(|_| Msg::CancelEditEnumValues)>{"cancel"}</button>
+                        <button onclick=self.link.callback(|_| Msg::UpdateFieldEnumValues)>{"save"}</button>
+                    </div>
+                }
+            }
+            None => html!{}
+        }
+    }
+    fn view_enum_values_list(&self) -> Html {
+        let fields = match &self.state.new_field.validation {
+            Some(validation) => {
+                match &validation.enum_values {
+                    Some(enum_values) => {
+                        html! {
+                            <ul>
+                            { for enum_values.iter().enumerate().map(|(index, enum_value)| html!{
+                                <div>
+                                    <div>{"value: "}{&enum_value.value}</div>
+                                    <div>{"label: "}{&enum_value.label}</div>
+                                    <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
+                                </div>
+                            } )}
+                            </ul>
+                        }
+                    },
+                    None => html!{}
+                }
+            },
+            None => html!{}
+        };
+        html!{
+            <div>
+                <h3>{"Enum values"}</h3>
+                {self.view_editing_enum_value()}
+                {fields}
+            </div>
+        }
+    }
     fn view_creating_enum_values(&self) -> Html {
         match &self.state.creating_enum_value {
             Some(creating_enum_value) => html!{
@@ -559,7 +630,7 @@ impl App {
                         value={&creating_enum_value.label}
                         oninput=self.link.callback(move |input: InputData|
                             {
-                                Msg::UpdateEnumValueLabel(input.value)
+                                Msg::UpdateNewEnumValueLabel(input.value)
                             })
                     />
                     {"Value:"}
@@ -568,12 +639,13 @@ impl App {
                         value={&creating_enum_value.value}
                         oninput=self.link.callback(move |input: InputData|
                             {
-                                Msg::UpdateEnumValueValue(input.value)
+                                Msg::UpdateNewEnumValueValue(input.value)
                             })
                     />
                     <button onclick=self.link.callback(|_| Msg::CreateNewEnumValue)>
                         {"add"}
                     </button>
+
                 </div>
             },
             None => html!{}
@@ -588,11 +660,14 @@ impl App {
             let create_enum_btn = match self.state.new_field.data_type {
                 Radio => {
                     match self.state.creating_enum_value {
-                        Some(_) => html!{},
+                        Some(_) => html!{{self.view_enum_values_list()}},
                         None => html!{
-                            <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
-                                {"create enum values"}
-                            </button>
+                            <div>
+                                <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
+                                    {"create enum values"}
+                                </button>
+                                {self.view_enum_values_list()}
+                            </div>
                         },
                     }
                 }
