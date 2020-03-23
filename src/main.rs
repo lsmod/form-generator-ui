@@ -31,6 +31,13 @@ struct EditingField {
     field: Field
 }
 
+#[derive(Debug)]
+enum EditorMode {
+    EditingField(EditingField),
+    CreatingField(Field),
+    Listing,
+}
+
 // TODO move into separated module
 struct App {
     link: ComponentLink<App>,
@@ -40,13 +47,10 @@ struct App {
 
 #[derive(Debug)]
 pub struct State {
-    editing_field: Option<EditingField>,
     editing_enum_value: Option<EditingEnumValue>,
-
-    new_field: Field, // TODO move this inside it's own struct
-    creating_field: bool, // TODO move this inside it's own struct
-
     creating_enum_value: Option<EnumValues>,
+
+    editing_mode: EditorMode,
     model: Model,
 }
 // TODO:
@@ -81,14 +85,9 @@ enum Msg {
     UpdateFieldType(FieldDataType),
     ToggleFieldRequired,
 
-    NewField, // TODO display enum_value if type = radio
+    NewField,
     CancelNewField,
     CreateField,
-    UpdateNewFieldName(String),
-    UpdateNewFieldLabel(String),
-    UpdateNewFieldPlaceHolder(String),
-    UpdateNewFieldType(FieldDataType),
-    ToggleNewFieldRequired,
 
     EditFieldEnumValues(usize), // click edit on enum value
     UpdateFieldEnumValues, // click on save (editing enum value)
@@ -97,6 +96,7 @@ enum Msg {
     UpdateEnumValueLabel(String),
     DeleteEnumValue(usize),
     NewEnumValue, // click new enum value
+    CancelNewEnumValue,
     CreateNewEnumValue, // click save new enum value
     UpdateNewEnumValueValue(String), // this is when adding a new field
     UpdateNewEnumValueLabel(String),
@@ -143,16 +143,7 @@ impl Component for App {
             link,
             console: ConsoleService::new(),
             state: State { // TODO : create a builder for this
-                editing_field: None,
-                creating_field: false,
-                new_field: Field {
-                    name: "".to_string(),
-                    data_type: FieldDataType::Text,
-                    label: "".to_string(),
-                    placeholder: "".to_string(),
-                    required: false,
-                    validation: None,
-                },
+                editing_mode: EditorMode::Listing,
                 editing_enum_value: None,
                 creating_enum_value: None,
                 model: Model {
@@ -185,146 +176,135 @@ impl Component for App {
                 true // TODO: return true only if new id != previous one ?
             }
             Msg::EditField(index) => {
-                self.state.editing_field = Some(EditingField {
-                    field: self.state.model.fields[index].clone(),
-                    id: index
-                });
+                self.state.editing_mode = EditorMode::EditingField(
+                    EditingField {
+                        field: self.state.model.fields[index].clone(),
+                        id: index
+                    }
+                );
                 true
             }
             Msg::CancelEditField => {
-                self.state.editing_field = None;
+                self.state.editing_mode = EditorMode::Listing;
                 true
             }
             Msg::UpdateField => {
-                match &self.state.editing_field {
-                    Some(editing_field) => {
+                match &self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => {
                         self.state.model.fields[editing_field.id]  = editing_field.field.clone();
-                        self.state.editing_field = None;
+                        self.state.editing_mode = EditorMode::Listing;
                     }
-                    None => ()
+                    _ => ()
                 }
                 true
             }
             Msg::UpdateFieldName(name) => {
-                self.console.log("toto");
-                match &mut self.state.editing_field {
-                    Some(editing_field) => editing_field.field.name = name,
-                    None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => editing_field.field.name = name,
+                    EditorMode::CreatingField(creating_field) => creating_field.name = name,
+                    _ => ()
                 };
                 true
             }
             Msg::UpdateFieldLabel(label) => {
-                match &mut self.state.editing_field {
-                    Some(editing_field) => editing_field.field.label = label,
-                    None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => editing_field.field.label = label,
+                    EditorMode::CreatingField(creating_field) => creating_field.label = label,
+                    _ => ()
                 };
                 true
             }
             Msg::UpdateFieldPlaceHolder(placeholder) => {
-                match &mut self.state.editing_field {
-                    Some(editing_field) => editing_field.field.placeholder = placeholder,
-                    None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => editing_field.field.placeholder = placeholder,
+                    EditorMode::CreatingField(creating_field) => creating_field.placeholder = placeholder,
+                    _ => ()
                 };
                 true
             }
             Msg::UpdateFieldType(data_type) => {
-                match &mut self.state.editing_field {
-                    Some(editing_field) => editing_field.field.data_type = data_type,
-                    None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => editing_field.field.data_type = data_type,
+                    EditorMode::CreatingField(creating_field) => creating_field.data_type = data_type,
+                    _ => ()
                 };
                 true
             }
             Msg::ToggleFieldRequired => {
-                match &mut self.state.editing_field {
-                    Some(editing_field) => editing_field.field.required = !editing_field.field.required,
-                    None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => editing_field.field.required = !editing_field.field.required,
+                    EditorMode::CreatingField(creating_field) => creating_field.required = !creating_field.required,
+                    _ => ()
                 };
                 true
             }
             Msg::NewField => {
-                self.state.creating_field = true;
-                self.state.new_field = Field {
-                    name: "".to_string(),
-                    data_type: FieldDataType::Text,
-                    label: "".to_string(),
-                    placeholder: "".to_string(),
-                    required: false,
-                    validation: None,
-                };
+                self.state.editing_mode = EditorMode::CreatingField(
+                    Field {
+                        name: "".to_string(),
+                        data_type: FieldDataType::Text,
+                        label: "".to_string(),
+                        placeholder: "".to_string(),
+                        required: false,
+                        validation: None,
+                    }
+                );
                 true
             }
             Msg::CancelNewField => {
-                self.state.creating_field = false;
+                self.state.editing_mode = EditorMode::Listing;
                 true
             }
             Msg::CreateField => {
-                self.state.creating_field = false;
-                self.state.model.fields.push(self.state.new_field.clone());
-                true
-            }
-            Msg::UpdateNewFieldName(name) => {
-                self.state.new_field.name = name;
-                true
-            }
-            Msg::UpdateNewFieldLabel(label) => {
-                self.state.new_field.label = label;
-                true
-            }
-            Msg::UpdateNewFieldPlaceHolder(placeholder) => {
-                self.state.new_field.placeholder = placeholder;
-                true
-            }
-            Msg::UpdateNewFieldType(data_type) => {
-                self.state.new_field.data_type = data_type;
-                true
-            }
-            Msg::ToggleNewFieldRequired => {
-                self.state.new_field.required = !self.state.new_field.required;
+                match &mut self.state.editing_mode {
+                    EditorMode::CreatingField(creating_field) => self.state.model.fields.push(creating_field.clone()),
+                    _ => ()
+                };
+                self.state.editing_mode = EditorMode::Listing;
                 true
             }
             Msg::EditFieldEnumValues(index) => {
-                if self.state.creating_field {
-                    match &self.state.new_field.validation {
-                        Some(validation) => {
-                            match &validation.enum_values {
-                                Some(enum_values) => {
-                                    self.state.editing_enum_value = Some(EditingEnumValue {
-                                        index: index,
-                                        enum_value: EnumValues {
-                                            value: enum_values[index].value.to_string(), // TODO get that value form current field
-                                            label: enum_values[index].label.to_string(),
-                                        },
-                                    });
-                                },
-                                None => (),
-                            }
-                        },
-                        None => ()
-                    }
-                } else {
-                    match &self.state.editing_field {
-                        Some(editing_field) => {
-                            match &editing_field.field.validation {
-                                Some(validation) => {
-                                    match &validation.enum_values {
-                                        Some(enum_values) => {
-                                            self.state.editing_enum_value = Some(EditingEnumValue {
-                                                index: index,
-                                                enum_value: EnumValues {
-                                                    value: enum_values[index].value.to_string(), // TODO get that value form current field
-                                                    label: enum_values[index].label.to_string(),
-                                                },
-                                            });
-                                        },
-                                        None => (),
-                                    }
-                                },
-                                None => ()
-                            }
+                match &mut self.state.editing_mode {
+                    EditorMode::CreatingField(new_field) => {
+                        match &new_field.validation {
+                            Some(validation) => {
+                                match &validation.enum_values {
+                                    Some(enum_values) => {
+                                        self.state.editing_enum_value = Some(EditingEnumValue {
+                                            index: index,
+                                            enum_value: EnumValues {
+                                                value: enum_values[index].value.to_string(), // TODO get that value form current field
+                                                label: enum_values[index].label.to_string(),
+                                            },
+                                        });
+                                    },
+                                    None => (),
+                                }
+                            },
+                            None => ()
                         }
-                        None => ()
-                    }
-                }
+                    },
+                    EditorMode::EditingField(editing_field) => {
+                        match &editing_field.field.validation {
+                            Some(validation) => {
+                                match &validation.enum_values {
+                                    Some(enum_values) => {
+                                        self.state.editing_enum_value = Some(EditingEnumValue {
+                                            index: index,
+                                            enum_value: EnumValues {
+                                                value: enum_values[index].value.to_string(), // TODO get that value form current field
+                                                label: enum_values[index].label.to_string(),
+                                            },
+                                        });
+                                    },
+                                    None => (),
+                                }
+                            },
+                            None => ()
+                        }
+                    },
+                    EditorMode::Listing => ()
+                };
                 self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
@@ -378,8 +358,8 @@ impl Component for App {
             Msg::CreateNewEnumValue  => {
                 match &mut self.state.creating_enum_value {
                     Some(creating_enum_value) => {
-                        match &mut self.state.editing_field {
-                            Some(editing_field) => { // we are editing a field
+                        match &mut self.state.editing_mode {
+                            EditorMode::EditingField(editing_field) => {
                                 match &mut editing_field.field.validation {
                                     Some(validation) => { // there is validation
                                         match &mut validation.enum_values {
@@ -399,30 +379,28 @@ impl Component for App {
                                         ()
                                     }
                                 }
-                            },
-                            None => {
-                                if self.state.creating_field { // we are creating a new field
-                                    match &mut self.state.new_field.validation {
-                                        Some(validation) => { // there is validation
-                                            match &mut validation.enum_values {
-                                                Some(enum_values) => enum_values.push(creating_enum_value.clone()),
-                                                None => { // there is no enum_values in validation
-                                                    validation.enum_values = Some(vec![creating_enum_value.clone()]);
-
-                                                }
+                            }
+                            EditorMode::CreatingField(creating_field) => {
+                                match &mut creating_field.validation {
+                                    Some(validation) => { // there is validation
+                                        match &mut validation.enum_values {
+                                            Some(enum_values) => enum_values.push(creating_enum_value.clone()),
+                                            None => { // there is no enum_values in validation
+                                                validation.enum_values = Some(vec![creating_enum_value.clone()]);
                                             }
-                                        },
-                                        None => { // no validation ? let's add some
-                                            self.state.new_field.validation = Some(Validation {
-                                                min_length: None,
-                                                max_length: None,
-                                                enum_values: Some(vec![creating_enum_value.clone()])
-                                            });
-                                            self.state.creating_enum_value = None;
                                         }
+                                    },
+                                    None => { // no validation ? let's add some
+                                        creating_field.validation = Some(Validation {
+                                            min_length: None,
+                                            max_length: None,
+                                            enum_values: Some(vec![creating_enum_value.clone()])
+                                        });
+                                        self.state.creating_enum_value = None;
                                     }
                                 }
-                            }
+                            },
+                            _ => ()
                         }
                     },
                     None => ()
@@ -432,8 +410,8 @@ impl Component for App {
                 true
             }
             Msg::UpdateFieldEnumValues => {
-                match &mut self.state.editing_field {
-                    Some(editing_field) => { // we are editing a field
+                match &mut self.state.editing_mode {
+                    EditorMode::EditingField(editing_field) => {
                         match &mut editing_field.field.validation {
                             Some(validation) => { // there is validation
                                 match &mut validation.enum_values {
@@ -451,62 +429,55 @@ impl Component for App {
                             None => ()
                         }
                     },
-                    None => {
-                        if self.state.creating_field {
-                            match &mut self.state.editing_enum_value {
-                                Some(editing_enum_value) => {
-                                    match &mut self.state.new_field.validation {
-                                        Some(validation) => {
-                                            match &mut validation.enum_values {
-                                                Some(enum_values) => {
-                                                    enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone();
-                                                },
-                                                None => ()
-                                            }
-                                        },
-                                        None => ()
-                                    }
-                                },
-                                None => ()
-                            }
+                    EditorMode::CreatingField(creating_field) => {
+                        match &mut self.state.editing_enum_value {
+                            Some(editing_enum_value) => {
+                                match &mut creating_field.validation {
+                                    Some(validation) => {
+                                        match &mut validation.enum_values {
+                                            Some(enum_values) => {
+                                                enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone();
+                                            },
+                                            None => ()
+                                        }
+                                    },
+                                    None => ()
+                                }
+                            },
+                            None => ()
                         }
-                        ()
-                    }
+                    },
+                    _ => ()
                 }
                 self.state.editing_enum_value = None;
                 self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::DeleteEnumValue(index) => {
-                // TODO check if we are editing or creating
-                // TODO check if field has validation ? none -> do nothing
-                // TODO if validation .length = 0 valdiation = None
-                if self.state.creating_field {
-                    match &mut self.state.new_field.validation {
-                        Some(validation) => {
-                            match &mut validation.enum_values {
-                                Some(enum_values) => {enum_values.remove(index);},
-                                None => ()
+                match &mut self.state.editing_mode {
+                    EditorMode::CreatingField(creating_field) => {
+                        match &mut creating_field.validation {
+                            Some(validation) => {
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {enum_values.remove(index);},
+                                    None => ()
+                                }
                             }
+                            None => (),
                         }
-                        None => (),
-                    }
-                }
-                else {
-                    match &mut self.state.editing_field {
-                        Some(editing_field) => {
-                            match &mut editing_field.field.validation {
-                                Some(validation) => {
-                                    match &mut validation.enum_values {
-                                        Some(enum_values) => {enum_values.remove(index);},
-                                        None => ()
-                                    }
-                                },
-                                None => ()
-                            }
-                        },
-                        None => ()
-                    }
+                    },
+                    EditorMode::EditingField(editing_field) => {
+                        match &mut editing_field.field.validation {
+                            Some(validation) => {
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {enum_values.remove(index);},
+                                    None => ()
+                                }
+                            },
+                            None => ()
+                        }
+                    },
+                    _ => (),
                 }
                 true
             }
@@ -618,8 +589,8 @@ impl App {
         }
     }
     fn view_enum_values_list(&self) -> Html {
-        if self.state.creating_field {
-            let fields = match &self.state.new_field.validation {
+        let view = |field: &Field| {
+            let fields = match &field.validation {
                 Some(validation) => {
                     match &validation.enum_values {
                         Some(enum_values) => {
@@ -648,40 +619,16 @@ impl App {
                     {fields}
                 </div>
             }
-        }
-        else {
-            match &self.state.editing_field {
-                Some(editing_field) => {
-                    let fields = match &editing_field.field.validation {
-                        Some(validation) => {
-                            match &validation.enum_values {
-                                Some(enum_values) => html!{
-                                    <ul>
-                                    { for enum_values.iter().enumerate().map(|(index, enum_value)| html!{
-                                        <div>
-                                            <div>{"value: "}{&enum_value.value}</div>
-                                            <div>{"label: "}{&enum_value.label}</div>
-                                            <button onclick=self.link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
-                                            <button onclick=self.link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
-                                        </div>
-                                    } )}
-                                    </ul>
-                                },
-                                None => html!{}
-                            }
-                        },
-                        None => html!{}
-                    };
-                    html!{
-                        <div>
-                            <h3>{"Enum values"}</h3>
-                            {self.view_editing_enum_value()}
-                            {fields}
-                        </div>
-                    }
-                },
-                None => html!{}
-            }
+        };
+
+        match &self.state.editing_mode {
+            EditorMode::CreatingField(creating_field) => {
+                view(creating_field)
+            },
+            EditorMode::EditingField(editing_field) => {
+                view(&editing_field.field)
+            },
+            _ => html!{}
         }
     }
 
@@ -719,73 +666,71 @@ impl App {
     }
 
     fn view_new_field(&self) -> Html {
-        let field = &self.state.new_field;
-
-        if self.state.creating_field {
-            let creating_enum_values_view = self.view_creating_enum_values();
-            let create_enum_btn = match self.state.new_field.data_type {
-                Radio => {
-                    match self.state.creating_enum_value {
-                        Some(_) => html!{{self.view_enum_values_list()}},
-                        None => html!{
-                            <div>
-                                <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
-                                    {"create enum values"}
-                                </button>
-                                {self.view_enum_values_list()}
-                            </div>
-                        },
+        match &self.state.editing_mode {
+            EditorMode::CreatingField(creating_field) => {
+                let creating_enum_values_view = self.view_creating_enum_values();
+                let create_enum_btn = match &creating_field.data_type {
+                    Radio => {
+                        match self.state.creating_enum_value {
+                            Some(_) => html!{{self.view_enum_values_list()}},
+                            None => html!{
+                                <div>
+                                    <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
+                                        {"create enum values"}
+                                    </button>
+                                    {self.view_enum_values_list()}
+                                </div>
+                            },
+                        }
                     }
-                }
-                _ => html!{}
-            };
-            html! {
-                <div class="model-field-editing">
-                    <h3>{"New field: "}{&field.name}</h3>
-                    {"Name:"}
-                    <input
-                        type="text"
-                        value={&field.name}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateNewFieldName(input.value)
-                            })
-                    />
+                    _ => html!{}
+                };
+                html! {
+                    <div class="model-field-editing">
+                        <h3>{"New field: "}{&creating_field.name}</h3>
+                        {"Name:"}
+                        <input
+                            type="text"
+                            value={&creating_field.name}
+                            oninput=self.link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldName(input.value)
+                                })
+                        />
 
-                    {"Type:"} {self.view_select_type(field.data_type.clone(), true)}<br/>
-                    {"Label:"}
-                    <input
-                        type="text"
-                        value={&field.label}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateNewFieldLabel(input.value)
-                            })
-                    />
-                    {"Placeholder:"} <input
-                        type="text"
-                        value={&field.placeholder}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateNewFieldPlaceHolder(input.value)
-                            })
-                    /><br/>
-                    {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleNewFieldRequired) name="required" checked=field.required />
-                    <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
-                    <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
-                    <br/>{creating_enum_values_view}
-                    {create_enum_btn}
-                </div>
-            }
-        }
-        else {
-            html!{}
+                        {"Type:"} {self.view_select_type(creating_field.data_type.clone())}<br/>
+                        {"Label:"}
+                        <input
+                            type="text"
+                            value={&creating_field.label}
+                            oninput=self.link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldLabel(input.value)
+                                })
+                        />
+                        {"Placeholder:"} <input
+                            type="text"
+                            value={&creating_field.placeholder}
+                            oninput=self.link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldPlaceHolder(input.value)
+                                })
+                        /><br/>
+                        {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleFieldRequired) name="required" checked=creating_field.required />
+                        <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
+                        <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
+                        <br/>{creating_enum_values_view}
+                        {create_enum_btn}
+                    </div>
+                }
+            },
+            _ => html!{}
         }
     }
 
     fn view_editing_field(&self) -> Html {
-        match &self.state.editing_field {
-            Some(editing_field) => {
+        match &self.state.editing_mode {
+            EditorMode::EditingField(editing_field) => {
                 let field = &editing_field.field;
                 let creating_enum_values_view = self.view_creating_enum_values();
                 let create_enum_btn = match editing_field.field.data_type {
@@ -816,7 +761,7 @@ impl App {
                                 Msg::UpdateFieldName(input.value)
                             })
                     />
-                    {"Type:"} {self.view_select_type(field.data_type.clone(), false)}<br/>
+                    {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
                     {"Label:"}
                     <input
                         type="text"
@@ -841,18 +786,17 @@ impl App {
                     {create_enum_btn}
                 </div>
             }},
-            None => html! {}
+            _ => html! {}
         }
     }
 
     // TODO pass on update callback as a function (so it can be used by Edit & create
-    fn view_select_type(&self, field_type: FieldDataType, creation_mode: bool) -> Html {
-        let callback = if creation_mode { Msg::UpdateNewFieldType } else { Msg::UpdateFieldType};
+    fn view_select_type(&self, field_type: FieldDataType) -> Html {
         html! {
             <Select<FieldDataType>
                 selected=Some(field_type)
                 options=FieldDataType::iter().collect::<Vec<_>>()
-                onchange=self.link.callback(callback) />
+                onchange=self.link.callback(Msg::UpdateFieldType) />
         }
     }
 }
