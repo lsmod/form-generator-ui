@@ -52,10 +52,11 @@ pub struct State {
 // TODO:
 // - separator
 
-// - handle list, radio, (anything with multiple value possible)
-// -> use validation -> enum_values
-// -> display a list with add/edit/remove/move up/move down
-// -> enum_values should be a tuple of string: 1 value 2 the label
+// -> make creation and edition exclusif (click on edit or create switch mode)
+// -> divide this monster file
+// - handle all FieldType using enum
+// move up/move down enum value
+// move up
 
 // - think about validation...
 // -> create error Struct with message
@@ -97,7 +98,6 @@ enum Msg {
     DeleteEnumValue(usize),
     NewEnumValue, // click new enum value
     CreateNewEnumValue, // click save new enum value
-    CancelNewEnumValue,
     UpdateNewEnumValueValue(String), // this is when adding a new field
     UpdateNewEnumValueLabel(String),
     /*
