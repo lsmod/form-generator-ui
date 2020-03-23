@@ -49,14 +49,12 @@ struct App {
 pub struct State {
     editing_enum_value: Option<EditingEnumValue>,
     creating_enum_value: Option<EnumValues>,
-
     editing_mode: EditorMode,
     model: Model,
 }
 // TODO:
 // - separator
 
-// -> make creation and edition exclusif (click on edit or create switch mode)
 // -> divide this monster file
 // - handle all FieldType using enum
 // move up/move down enum value
@@ -264,44 +262,31 @@ impl Component for App {
                 true
             }
             Msg::EditFieldEnumValues(index) => {
+                let edit_enum_value = |field: &Field, editing_enum_value: &mut Option<EditingEnumValue>| {
+                    match &field.validation {
+                        Some(validation) => {
+                            match &validation.enum_values {
+                                Some(enum_values) => {
+                                    *editing_enum_value = Some(EditingEnumValue {
+                                        index: index,
+                                        enum_value: EnumValues {
+                                            value: enum_values[index].value.to_string(), // TODO get that value form current field
+                                            label: enum_values[index].label.to_string(),
+                                        },
+                                    });
+                                },
+                                None => (),
+                            }
+                        },
+                        None => ()
+                    }
+                };
                 match &mut self.state.editing_mode {
                     EditorMode::CreatingField(new_field) => {
-                        match &new_field.validation {
-                            Some(validation) => {
-                                match &validation.enum_values {
-                                    Some(enum_values) => {
-                                        self.state.editing_enum_value = Some(EditingEnumValue {
-                                            index: index,
-                                            enum_value: EnumValues {
-                                                value: enum_values[index].value.to_string(), // TODO get that value form current field
-                                                label: enum_values[index].label.to_string(),
-                                            },
-                                        });
-                                    },
-                                    None => (),
-                                }
-                            },
-                            None => ()
-                        }
+                        edit_enum_value(new_field, &mut self.state.editing_enum_value)
                     },
                     EditorMode::EditingField(editing_field) => {
-                        match &editing_field.field.validation {
-                            Some(validation) => {
-                                match &validation.enum_values {
-                                    Some(enum_values) => {
-                                        self.state.editing_enum_value = Some(EditingEnumValue {
-                                            index: index,
-                                            enum_value: EnumValues {
-                                                value: enum_values[index].value.to_string(), // TODO get that value form current field
-                                                label: enum_values[index].label.to_string(),
-                                            },
-                                        });
-                                    },
-                                    None => (),
-                                }
-                            },
-                            None => ()
-                        }
+                        edit_enum_value(&editing_field.field, &mut self.state.editing_enum_value)
                     },
                     EditorMode::Listing => ()
                 };
@@ -356,49 +341,36 @@ impl Component for App {
                 true
             }
             Msg::CreateNewEnumValue  => {
+                let add_enum = |field: &mut Field, creating_enum_value: &EnumValues| {
+                    match &mut field.validation {
+                        Some(validation) => { // there is validation
+                            match &mut validation.enum_values {
+                                Some(enum_values) => {
+                                    enum_values.push(creating_enum_value.clone());
+                                },
+                                None => { // there is no enum_values in validation
+                                    validation.enum_values = Some(vec![creating_enum_value.clone()]);
+                                }
+                            }
+                        },
+                        None => {
+                            field.validation = Some(Validation{
+                                min_length: None,
+                                max_length: None,
+                                enum_values: Some(vec![creating_enum_value.clone()])
+                            });
+                            ()
+                        }
+                    }
+                };
                 match &mut self.state.creating_enum_value {
                     Some(creating_enum_value) => {
                         match &mut self.state.editing_mode {
                             EditorMode::EditingField(editing_field) => {
-                                match &mut editing_field.field.validation {
-                                    Some(validation) => { // there is validation
-                                        match &mut validation.enum_values {
-                                            Some(enum_values) => {
-                                                enum_values.push(creating_enum_value.clone());
-                                                self.state.creating_enum_value = None;
-                                            },
-                                            None => ()
-                                        }
-                                    },
-                                    None => {
-                                        editing_field.field.validation = Some(Validation{
-                                            min_length: None,
-                                            max_length: None,
-                                            enum_values: Some(vec![creating_enum_value.clone()])
-                                        });
-                                        ()
-                                    }
-                                }
+                                add_enum(&mut editing_field.field, creating_enum_value);
                             }
                             EditorMode::CreatingField(creating_field) => {
-                                match &mut creating_field.validation {
-                                    Some(validation) => { // there is validation
-                                        match &mut validation.enum_values {
-                                            Some(enum_values) => enum_values.push(creating_enum_value.clone()),
-                                            None => { // there is no enum_values in validation
-                                                validation.enum_values = Some(vec![creating_enum_value.clone()]);
-                                            }
-                                        }
-                                    },
-                                    None => { // no validation ? let's add some
-                                        creating_field.validation = Some(Validation {
-                                            min_length: None,
-                                            max_length: None,
-                                            enum_values: Some(vec![creating_enum_value.clone()])
-                                        });
-                                        self.state.creating_enum_value = None;
-                                    }
-                                }
+                                add_enum(creating_field, creating_enum_value)
                             },
                             _ => ()
                         }
@@ -410,42 +382,31 @@ impl Component for App {
                 true
             }
             Msg::UpdateFieldEnumValues => {
+                let update_enum_values = |field: &mut Field, editing_enum_value: & Option<EditingEnumValue>| {
+                    match &mut field.validation {
+                        Some(validation) => { // there is validation
+                            match &mut validation.enum_values {
+                                Some(enum_values) => {
+                                    match editing_enum_value {
+                                        Some(editing_enum_value) => { // we are also editing an enum value
+                                            enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone()
+                                        },
+                                        None => ()
+                                    }
+                                },
+                                None => ()
+                            }
+                        },
+                        None => ()
+                    }
+                };
+
                 match &mut self.state.editing_mode {
                     EditorMode::EditingField(editing_field) => {
-                        match &mut editing_field.field.validation {
-                            Some(validation) => { // there is validation
-                                match &mut validation.enum_values {
-                                    Some(enum_values) => {
-                                        match &mut self.state.editing_enum_value {
-                                            Some(editing_enum_value) => { // we are also editing an enum value
-                                                enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone()
-                                            },
-                                            None => ()
-                                        }
-                                    },
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                        update_enum_values(&mut editing_field.field, &self.state.editing_enum_value)
                     },
                     EditorMode::CreatingField(creating_field) => {
-                        match &mut self.state.editing_enum_value {
-                            Some(editing_enum_value) => {
-                                match &mut creating_field.validation {
-                                    Some(validation) => {
-                                        match &mut validation.enum_values {
-                                            Some(enum_values) => {
-                                                enum_values[editing_enum_value.index] = editing_enum_value.enum_value.clone();
-                                            },
-                                            None => ()
-                                        }
-                                    },
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                        update_enum_values(creating_field, &self.state.editing_enum_value)
                     },
                     _ => ()
                 }
@@ -454,28 +415,24 @@ impl Component for App {
                 true
             }
             Msg::DeleteEnumValue(index) => {
+                let remove_enum = |field: &mut Field, index: usize| {
+                    match &mut field.validation {
+                        Some(validation) => {
+                            match &mut validation.enum_values {
+                                Some(enum_values) => {enum_values.remove(index);},
+                                None => ()
+                            }
+                        }
+                        None => (),
+                    }
+                };
+
                 match &mut self.state.editing_mode {
                     EditorMode::CreatingField(creating_field) => {
-                        match &mut creating_field.validation {
-                            Some(validation) => {
-                                match &mut validation.enum_values {
-                                    Some(enum_values) => {enum_values.remove(index);},
-                                    None => ()
-                                }
-                            }
-                            None => (),
-                        }
+                        remove_enum(creating_field, index)
                     },
                     EditorMode::EditingField(editing_field) => {
-                        match &mut editing_field.field.validation {
-                            Some(validation) => {
-                                match &mut validation.enum_values {
-                                    Some(enum_values) => {enum_values.remove(index);},
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                        remove_enum(&mut editing_field.field, index)
                     },
                     _ => (),
                 }
