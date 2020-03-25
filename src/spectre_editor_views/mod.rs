@@ -12,7 +12,8 @@ use crate::App;
 use crate::Msg;
 use crate::EditingEnumValue;
 
-
+// TODO: hide model form when editing or creating
+// TODO: larger button on the right
 pub fn main_view(link: &ComponentLink<App>, model: &Model, editing_view: Html, creating_view: Html ) -> Html {
     let model_subtitle: String = if let Some(model_subtitle) = &model.subtitle { model_subtitle.clone() } else { "".to_string() };
     let model_title: String = if let Some(model_title) = &model.title { model_title.clone() } else { "".to_string() };
@@ -78,17 +79,21 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, editing_view: Html, c
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="input_model-submit_label">{"Submit button label: "}</label>
-                        <input
-                            type="text"
-                            class="form-input"
-                            id="input_model-submit_label"
-                            value={&model.submit_label}
-                            oninput=link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateSubmitLabel(input.value)
-                            })
-                            />
+                        <div class="col-3 col-sm-12">
+                            <label class="form-label" for="input_model-submit_label">{"Submit button label: "}</label>
+                        </div>
+                        <div class="col-9 col-sm-12">
+                            <input
+                                type="text"
+                                class="form-input"
+                                id="input_model-submit_label"
+                                value={&model.submit_label}
+                                oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateSubmitLabel(input.value)
+                                })
+                                />
+                        </div>
                     </div>
                 </form>
 
@@ -229,70 +234,102 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
     html! {
         <div>
             <h3>{"New field: "}{&creating_field.name}</h3>
-            <div class="form-group">
-                <label class="form-label" for="field-editing_name">{"Name:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_name"
-                    value={&creating_field.name}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldName(input.value)
-                        })
-                />
-            </div>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_name">{"Name:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_name"
+                            value={&creating_field.name}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldName(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_label">{"Label:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_label"
-                    value={&creating_field.label}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldLabel(input.value)
-                        })
-                />
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_label">{"Label:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_label"
+                            value={&creating_field.label}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldLabel(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_placeholder">{"Placeholder:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_placeholder"
-                    value={&creating_field.placeholder}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldPlaceHolder(input.value)
-                        })
-                />
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_placeholder">{"Placeholder:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_placeholder"
+                            value={&creating_field.placeholder}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldPlaceHolder(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-checkbox" for="field-editing_required">
-                    <input
-                        type="checkbox"
-                        class="form-checkbox"
-                        id="field-editing_required"
-                        onclick=link.callback(|_| Msg::ToggleFieldRequired)
-                        checked=creating_field.required />
-                    <i class="form-icon"></i>{"Required"}
-                </label>
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_required">{"Validation:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <label class="form-checkbox" for="field-editing_required">
+                            <input
+                                type="checkbox"
+                                class="form-checkbox"
+                                id="field-editing_required"
+                                onclick=link.callback(|_| Msg::ToggleFieldRequired)
+                                checked=creating_field.required />
+                            <i class="form-icon"></i>{"Required"}
+                        </label>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_name">{"Type:"}</label>
-                {field_type_select_view}
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_name">{"Type:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {field_type_select_view}
+                    </div>
+                </div>
+                {create_enum_btn_view}
+                {creating_enum_values_view}
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
 
-            {create_enum_btn_view}
-            {creating_enum_values_view}
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <button class="btn" onclick=link.callback(|_| Msg::CancelNewField)>{"cancel"}</button><button class="btn" onclick=link.callback(|_| Msg::CreateField)>{"save"}</button>
+                    </div>
+                </div>
+            </form>
 
-            <button class="btn" onclick=link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
-            <button class="btn" onclick=link.callback(|_| Msg::CreateField)>{"save"}</button>
+
+
+
+
         </div>
     }
 }
