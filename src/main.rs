@@ -1,4 +1,4 @@
-#![recursion_limit="512"]
+#![recursion_limit="1024"]
 extern crate strum;
 #[macro_use]
 extern crate strum_macros;

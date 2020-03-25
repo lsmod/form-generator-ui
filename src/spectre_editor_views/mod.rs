@@ -21,64 +21,76 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, editing_view: Html, c
         <div>
             <h1>{"Model: "}{&model.name}</h1>
             <div>
-                <div class="form-group">
-                    <label class="form-label" for="input_model-name">{"Name: "}</label>
-                    <input
-                        type="text"
-                        required=true
-                        class="form-input"
-                        id="input_model-name"
-                        placeholder="Name"
-                        value={&model.name}
-                        oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateName(input.value)
-                        }) />
-                </div>
-                <div class="form-group">
-                    <label for="input_model-title" class="form-label">{"Title: "}</label>
-                    <input
-                        type="text"
-                        required=true
-                        class="form-input"
-                        id="input_model-title"
-                        placeholder="Title"
-                        value={model_title}
-                        oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateTitle(input.value)
-                        }) />
-                </div>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-3 col-sm-12">
+                            <label class="form-label" for="input_model-name">{"Name: "}</label>
+                        </div>
+                        <div class="col-9 col-sm-12">
+                            <input
+                                type="text"
+                                required=true
+                                class="form-input"
+                                id="input_model-name"
+                                placeholder="Name"
+                                value={&model.name}
+                                oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateName(input.value)
+                                }) />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-3 col-sm-12">
+                            <label for="input_model-title" class="form-label">{"Title: "}</label>
+                        </div>
+                        <div class="col-9 col-sm-12">
+                            <input
+                                type="text"
+                                required=true
+                                class="form-input"
+                                id="input_model-title"
+                                placeholder="Title"
+                                value={model_title}
+                                oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateTitle(input.value)
+                                }) />
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <div class="col-3 col-sm-12">
+                            <label class="form-label" for="input_model-subtitle">{"Sub-Title: "}</label>
+                        </div>
+                        <div class="col-9 col-sm-12">
+                            <input
+                                type="text"
+                                class="form-input"
+                                id="input_model-subtitle"
+                                value={model_subtitle}
+                                oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateSubtitle(input.value)
+                                })
+                            />
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="input_model-subtitle">{"Sub-Title: "}</label>
-                    <input
-                        type="text"
-                        class="form-input"
-                        id="input_model-subtitle"
-                        value={model_subtitle}
-                        oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateSubtitle(input.value)
-                        })
-                    />
-                </div>
-
-
-                <div class="form-group">
-                    <label class="form-label" for="input_model-submit_label">{"Submit button label: "}</label>
-                    <input
-                        type="text"
-                        class="form-input"
-                        id="input_model-submit_label"
-                        value={&model.submit_label}
-                        oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateSubmitLabel(input.value)
-                        })
-                        />
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="input_model-submit_label">{"Submit button label: "}</label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="input_model-submit_label"
+                            value={&model.submit_label}
+                            oninput=link.callback(move |input: InputData|
+                            {
+                                Msg::UpdateSubmitLabel(input.value)
+                            })
+                            />
+                    </div>
+                </form>
 
                 <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
                 { editing_view }
