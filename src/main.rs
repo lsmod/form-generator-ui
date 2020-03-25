@@ -7,13 +7,19 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
+mod spectre_editor_views;
+use crate::spectre_editor_views::main_view;
+use crate::spectre_editor_views::view_enum_values_list_container;
+use crate::spectre_editor_views::view_edit_field_container;
+use crate::spectre_editor_views::view_new_field_container;
+use crate::spectre_editor_views::view_create_enum_btn_container;
+use crate::spectre_editor_views::view_enum_values_container;
+use crate::spectre_editor_views::view_field_type_select;
 use crate::spectre_editor_views::view_creating_enum_values;
 use crate::spectre_editor_views::view_editing_enum_value;
-use strum::IntoEnumIterator;
+
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
-use yew::components::Select;
 use yew::services::ConsoleService;
-use yew::html::InputData;
 
 mod form_model;
 pub use form_model::form_model::*;
@@ -22,9 +28,6 @@ pub use form_model::form_model::FieldDataType::*;
 mod react_native;
 pub use react_native::to_html_type;
 
-mod spectre_editor_views;
-use spectre_editor_views::view_field_item;
-use spectre_editor_views::view_enum_values_item;
 
 #[derive(Debug)]
 pub struct EditingEnumValue {
@@ -166,19 +169,19 @@ impl Component for App {
         match msg {
             Msg::UpdateName(name) => {
                 self.state.model.name = name;
-                true // TODO: return true only if new id != previous one ?
+                true
             }
-            Msg::UpdateTitle(name) => {
-                self.state.model.title = Some(name);
-                true // TODO: return true only if new id != previous one ?
+            Msg::UpdateTitle(title) => {
+                self.state.model.title = Some(title);
+                true
             }
-            Msg::UpdateSubtitle(name) => {
-                self.state.model.subtitle = Some(name);
-                true // TODO: return true only if new id != previous one ?
+            Msg::UpdateSubtitle(subtitle) => {
+                self.state.model.subtitle = Some(subtitle);
+                true
             }
-            Msg::UpdateSubmitLabel(name) => {
-                self.state.model.submit_label = name;
-                true // TODO: return true only if new id != previous one ?
+            Msg::UpdateSubmitLabel(label) => {
+                self.state.model.submit_label = label;
+                true
             }
             Msg::EditField(index) => {
                 self.state.editing_mode = EditorMode::EditingField(
@@ -449,73 +452,17 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        let model_title: String = if let Some(model_title) = &self.state.model.title { model_title.clone() } else { "".to_string() };
-        let model_subtitle: String = if let Some(model_subtitle) = &self.state.model.subtitle { model_subtitle.clone() } else { "".to_string() };
         let editing_view = self.view_editing_field();
         let creating_view = self.view_new_field();
-        html! {
-            <div>
-                <div class="model-header">
-                    <h1>{"Model: "}{&self.state.model.name}</h1>
-                    <div class="model-property">
-                        <div class="model-name-container">
-                            {"Name: "}
-                            <input type="text" name="model-name" oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateName(input.value)
-                            }) value={&self.state.model.name} />
-                        </div>
-                    </div>
-                    <div class="model-property">
-                        <div class="model-title-container">
-                            {"Title: "}
-                            <input type="text" name="model-title" oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateTitle(input.value)
-                            }) value={model_title} />
-                        </div>
-                    </div>
-                    <div class="model-property">
-                        <div class="model-subtitle-container">
-                            {"Sub-Title: "}
-                            <input type="text" name="model-subtitle" oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateSubtitle(input.value)
-                            }) value={model_subtitle} />
-                        </div>
-                    </div>
-                    <div class="model-property">
-                        <div class="model-submit_label-container">
-                            {"Submit button label: "}
-                            <input type="text" name="model-submit_label" oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateSubmitLabel(input.value)
-                            }) value={&self.state.model.submit_label} />
-                        </div>
-                    </div>
-                    <button onclick=self.link.callback(|_| Msg::NewField)>{"New field"}</button>
-                    { editing_view }
-                    { creating_view}
-                    <div class="model-field-container">
-                        <ul>
-                        { for self.state.model.fields.iter().enumerate().map(|(index, field)| self.view_field_item(index, field)) }
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        }
+        main_view(&self.link, &self.state.model, editing_view, creating_view  )
     }
 }
 
 impl App {
-    fn view_field_item(&self, index: usize, field: &Field) -> Html {
-        view_field_item(&self, index, field)
-    }
-
     fn view_editing_enum_value(&self) -> Html {
         match &self.state.editing_enum_value {
             Some(editing_enum_value) => {
-                view_editing_enum_value(&self, editing_enum_value)
+                view_editing_enum_value(&self.link, editing_enum_value)
             }
             None => html!{}
         }
@@ -523,34 +470,18 @@ impl App {
 
     fn view_enum_values_list(&self) -> Html {
         let view = |field: &Field| {
-            let fields = match &field.validation {
+            let enum_value_list = match &field.validation {
                 Some(validation) => {
                     match &validation.enum_values {
                         Some(enum_values) => {
-                            html! {
-                                <ul>
-                                { for enum_values
-                                    .iter()
-                                    .enumerate()
-                                    .map(|(index, enum_value)|
-                                        view_enum_values_item(&self, index, enum_value)
-                                    )
-                                }
-                                </ul>
-                            }
+                            view_enum_values_list_container(&self.link, enum_values)
                         },
                         None => html!{}
                     }
                 },
                 None => html!{}
             };
-            html!{
-                <div>
-                    <h3>{"Enum values"}</h3>
-                    {self.view_editing_enum_value()}
-                    {fields}
-                </div>
-            }
+            view_enum_values_container(self.view_editing_enum_value(), enum_value_list)
         };
 
         match &self.state.editing_mode {
@@ -566,7 +497,7 @@ impl App {
 
     fn view_creating_enum_values(&self) -> Html {
         match &self.state.creating_enum_value {
-            Some(creating_enum_value) => view_creating_enum_values(&self, creating_enum_value),
+            Some(creating_enum_value) => view_creating_enum_values(&self.link, creating_enum_value),
             None => html!{}
         }
     }
@@ -575,60 +506,16 @@ impl App {
         match &self.state.editing_mode {
             EditorMode::CreatingField(creating_field) => {
                 let creating_enum_values_view = self.view_creating_enum_values();
-                let create_enum_btn = match &creating_field.data_type {
+                let create_enum_btn_view = match &creating_field.data_type {
                     Radio => {
                         match self.state.creating_enum_value {
                             Some(_) => html!{{self.view_enum_values_list()}},
-                            None => html!{
-                                <div>
-                                    <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
-                                        {"create enum values"}
-                                    </button>
-                                    {self.view_enum_values_list()}
-                                </div>
-                            },
+                            None => view_create_enum_btn_container(&self.link, self.view_enum_values_list()),
                         }
                     }
                     _ => html!{}
                 };
-                html! {
-                    <div class="model-field-editing">
-                        <h3>{"New field: "}{&creating_field.name}</h3>
-                        {"Name:"}
-                        <input
-                            type="text"
-                            value={&creating_field.name}
-                            oninput=self.link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateFieldName(input.value)
-                                })
-                        />
-
-                        {"Type:"} {self.view_select_type(creating_field.data_type.clone())}<br/>
-                        {"Label:"}
-                        <input
-                            type="text"
-                            value={&creating_field.label}
-                            oninput=self.link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateFieldLabel(input.value)
-                                })
-                        />
-                        {"Placeholder:"} <input
-                            type="text"
-                            value={&creating_field.placeholder}
-                            oninput=self.link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateFieldPlaceHolder(input.value)
-                                })
-                        /><br/>
-                        {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleFieldRequired) name="required" checked=creating_field.required />
-                        <button onclick=self.link.callback(|_| Msg::CancelNewField)>{"cancel"}</button>
-                        <button onclick=self.link.callback(|_| Msg::CreateField)>{"save"}</button>
-                        <br/>{creating_enum_values_view}
-                        {create_enum_btn}
-                    </div>
-                }
+                view_new_field_container(&self.link, &creating_field, creating_enum_values_view, create_enum_btn_view, self.view_field_type_select(creating_field.data_type.clone()))
             },
             _ => html!{}
         }
@@ -639,71 +526,23 @@ impl App {
             EditorMode::EditingField(editing_field) => {
                 let field = &editing_field.field;
                 let creating_enum_values_view = self.view_creating_enum_values();
-                let create_enum_btn = match editing_field.field.data_type {
+                let create_enum_btn_view = match editing_field.field.data_type {
                     Radio => {
                         match self.state.creating_enum_value {
                             Some(_) => html!{{self.view_enum_values_list()}},
-                            None => html!{
-                                <div>
-                                    <button onclick=self.link.callback(|_| Msg::NewEnumValue)>
-                                        {"create enum values"}
-                                    </button>
-                                    {self.view_enum_values_list()}
-                                </div>
-                            },
+                            None => view_create_enum_btn_container(&self.link, self.view_enum_values_list()),
                         }
                     }
                     _ => html!{}
                 };
-                html! {
-                <div class="model-field-editing">
-                    <h3>{"Editing field: "}{&field.name}</h3>
-                    {"Name:"}
-                    <input
-                        type="text"
-                        value={&field.name}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateFieldName(input.value)
-                            })
-                    />
-                    {"Type:"} {self.view_select_type(field.data_type.clone())}<br/>
-                    {"Label:"}
-                    <input
-                        type="text"
-                        value={&field.label}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateFieldLabel(input.value)
-                            })
-                    />
-                    {"Placeholder:"} <input
-                        type="text"
-                        value={&field.placeholder}
-                        oninput=self.link.callback(move |input: InputData|
-                            {
-                                Msg::UpdateFieldPlaceHolder(input.value)
-                            })
-                    /><br/>
-                    {"Required :"} <input type="checkbox" onclick=self.link.callback(|_| Msg::ToggleFieldRequired) name="required" checked=field.required />
-                    <button onclick=self.link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
-                    <button onclick=self.link.callback(|_| Msg::UpdateField)>{"save"}</button>
-                    <br/>{creating_enum_values_view}
-                    {create_enum_btn}
-                </div>
-            }},
+                view_edit_field_container(&self.link, &field, creating_enum_values_view, create_enum_btn_view, self.view_field_type_select(field.data_type.clone()))
+            },
             _ => html! {}
         }
     }
 
-    // TODO pass on update callback as a function (so it can be used by Edit & create
-    fn view_select_type(&self, field_type: FieldDataType) -> Html {
-        html! {
-            <Select<FieldDataType>
-                selected=Some(field_type)
-                options=FieldDataType::iter().collect::<Vec<_>>()
-                onchange=self.link.callback(Msg::UpdateFieldType) />
-        }
+    fn view_field_type_select(&self, field_type: FieldDataType) -> Html {
+        view_field_type_select(&self.link, field_type)
     }
 }
 
