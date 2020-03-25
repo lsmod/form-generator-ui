@@ -1,5 +1,5 @@
 [package]
-name = "yew-getting-started"
+name = "form-generator-front"
 version = "0.1.0"
 authors = ["lsmod <1526305+lsmod@users.noreply.github.com>"]
 edition = "2018"
