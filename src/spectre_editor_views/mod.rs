@@ -12,7 +12,7 @@ use crate::App;
 use crate::Msg;
 use crate::EditingEnumValue;
 
-// TODO: larger button on the right
+// TODO: add cancel save (when creating editing enum values)
 pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html ) -> Html {
     html! {
         <div>
@@ -120,9 +120,14 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
                                 />
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-3 col-sm-12"></div>
+                        <div class="col-9 col-sm-12">
+                            <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
+                        </div>
+                    </div>
                 </form>
             </div>
-            <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
         </div>
     }
 }
@@ -318,8 +323,16 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
                         {field_type_select_view}
                     </div>
                 </div>
-                {create_enum_btn_view}
-                {creating_enum_values_view}
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {create_enum_btn_view}
+                        {creating_enum_values_view}
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
 
@@ -329,11 +342,6 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
                     </div>
                 </div>
             </form>
-
-
-
-
-
         </div>
     }
 }
@@ -342,70 +350,110 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
     html! {
         <div>
             <h3>{"Edit field: "}{&creating_field.name}</h3>
-            <div class="form-group">
-                <label class="form-label" for="field-editing_name">{"Name:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_name"
-                    value={&creating_field.name}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldName(input.value)
-                        })
-                />
-            </div>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_name">{"Name:"}</label>
+                    </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_label">{"Label:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_label"
-                    value={&creating_field.label}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldLabel(input.value)
-                        })
-                />
-            </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_name"
+                            value={&creating_field.name}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldName(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_placeholder">{"Placeholder:"}</label>
-                <input
-                    type="text"
-                    class="form-input"
-                    id="field-editing_placeholder"
-                    value={&creating_field.placeholder}
-                    oninput=link.callback(move |input: InputData|
-                        {
-                            Msg::UpdateFieldPlaceHolder(input.value)
-                        })
-                />
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_label">{"Label:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_label"
+                            value={&creating_field.label}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldLabel(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-checkbox" for="field-editing_required">
-                    <input
-                        type="checkbox"
-                        class="form-checkbox"
-                        id="field-editing_required"
-                        onclick=link.callback(|_| Msg::ToggleFieldRequired)
-                        checked=creating_field.required />
-                    <i class="form-icon"></i>{"Required"}
-                </label>
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_placeholder">{"Placeholder:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="field-editing_placeholder"
+                            value={&creating_field.placeholder}
+                            oninput=link.callback(move |input: InputData|
+                                {
+                                    Msg::UpdateFieldPlaceHolder(input.value)
+                                })
+                        />
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="field-editing_name">{"Type:"}</label>
-                {field_type_select_view}
-            </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <label class="form-checkbox" for="field-editing_required">
+                            <input
+                                type="checkbox"
+                                class="form-checkbox"
+                                id="field-editing_required"
+                                onclick=link.callback(|_| Msg::ToggleFieldRequired)
+                                checked=creating_field.required />
+                            <i class="form-icon"></i>{"Required"}
+                        </label>
+                    </div>
+                </div>
 
-            {create_enum_btn_view}
-            {creating_enum_values_view}
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="field-editing_name">{"Type:"}</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {field_type_select_view}
+                    </div>
+                </div>
 
-            <button class="btn" onclick=link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
-            <button class="btn" onclick=link.callback(|_| Msg::UpdateField)>{"save"}</button>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {create_enum_btn_view}
+                        {creating_enum_values_view}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <button class="btn" onclick=link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
+                        <button class="btn" onclick=link.callback(|_| Msg::UpdateField)>{"save"}</button>
+                    </div>
+                </div>
+            </form>
+
+
+
         </div>
     }
 }
@@ -414,7 +462,7 @@ pub fn view_create_enum_btn_container(link: &ComponentLink<App>, view_enum_value
     html! {
         <div>
             <button class="btn" onclick=link.callback(|_| Msg::NewEnumValue)>
-                {"create enum values"}
+                {"New Type value"}
             </button>
             {view_enum_values_list}
         </div>
