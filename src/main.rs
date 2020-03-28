@@ -8,6 +8,7 @@ extern crate serde;
 extern crate serde_json;
 
 mod spectre_editor_views;
+use crate::spectre_editor_views::view_edit_model_view;
 use crate::spectre_editor_views::main_view;
 use crate::spectre_editor_views::view_enum_values_list_container;
 use crate::spectre_editor_views::view_edit_field_container;
@@ -452,9 +453,12 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        let editing_view = self.view_editing_field();
-        let creating_view = self.view_new_field();
-        main_view(&self.link, &self.state.model, editing_view, creating_view  )
+        let top_view = match &self.state.editing_mode {
+            EditorMode::CreatingField(_) => self.view_new_field(),
+            EditorMode::EditingField(_) => self.view_editing_field(),
+            EditorMode::Listing => view_edit_model_view(&self.link, &self.state.model)
+        };
+        main_view(&self.link, &self.state.model, top_view)
     }
 }
 

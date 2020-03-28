@@ -12,9 +12,34 @@ use crate::App;
 use crate::Msg;
 use crate::EditingEnumValue;
 
-// TODO: hide model form when editing or creating
 // TODO: larger button on the right
-pub fn main_view(link: &ComponentLink<App>, model: &Model, editing_view: Html, creating_view: Html ) -> Html {
+pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html ) -> Html {
+    html! {
+        <div>
+            { top_view }
+            <div class="model-field-container">
+                <h2>{"Fields"}</h2>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>{"Name"}</th>
+                      <th>{"Type"}</th>
+                      <th>{"Label"}</th>
+                      <th>{"Placeholder"}</th>
+                      <th>{"Required"}</th>
+                      <th>{"Action"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  { for model.fields.iter().enumerate().map(|(index, field)| view_field_item(link, index, field)) }
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
     let model_subtitle: String = if let Some(model_subtitle) = &model.subtitle { model_subtitle.clone() } else { "".to_string() };
     let model_title: String = if let Some(model_title) = &model.title { model_title.clone() } else { "".to_string() };
 
@@ -96,29 +121,8 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, editing_view: Html, c
                         </div>
                     </div>
                 </form>
-
-                <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
-                { editing_view }
-                { creating_view}
-                <div class="model-field-container">
-                    <h2>{"Fields"}</h2>
-                    <table class="table table-striped table-hover">
-                      <thead>
-                        <tr>
-                          <th>{"Name"}</th>
-                          <th>{"Type"}</th>
-                          <th>{"Label"}</th>
-                          <th>{"Placeholder"}</th>
-                          <th>{"Required"}</th>
-                          <th>{"Action"}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      { for model.fields.iter().enumerate().map(|(index, field)| view_field_item(link, index, field)) }
-                      </tbody>
-                    </table>
-                </div>
             </div>
+            <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
         </div>
     }
 }
