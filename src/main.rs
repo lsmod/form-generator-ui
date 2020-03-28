@@ -64,6 +64,7 @@ pub struct State {
     model: Model,
 }
 // TODO:
+// bug: click on edit enum value -> show edit then redirect to home without saving
 // - separator
 
 // -> divide this monster file
