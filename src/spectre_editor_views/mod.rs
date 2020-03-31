@@ -177,8 +177,8 @@ fn view_enum_values_item(link: &ComponentLink<App>, index: usize, enum_value: &E
             <td>{&enum_value.value}</td>
             <td>{&enum_value.label}</td>
             <td>
-                <button class="btn" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
-                <button class="btn" onclick=link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
             </td>
         </tr>
     }
@@ -210,8 +210,8 @@ pub fn view_editing_enum_value(link: &ComponentLink<App>, editing_enum_value: &E
                                         Msg::UpdateEnumValueLabel(input.value)
                                     })
                 />
-                <button class="btn" onclick=link.callback(|_| Msg::CancelEditEnumValues)>{"cancel"}</button>
-                <button class="btn" onclick=link.callback(|_| Msg::UpdateFieldEnumValues)>{"save"}</button>
+                <button class="btn" type="button" onclick=link.callback(|_| Msg::CancelEditEnumValues)>{"cancel"}</button>
+                <button class="btn" type="button" onclick=link.callback(|_| Msg::UpdateFieldEnumValues)>{"save"}</button>
             </div>
         </div>
     }
@@ -239,11 +239,11 @@ pub fn view_enum_values_container(editing_enum_value: Html, enum_values_list: Ht
     }
 }
 
-pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Field, creating_enum_values_view: Html, create_enum_btn_view: Html, field_type_select_view: Html) -> Html {
+pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Field, enum_values_list_view: Html, creating_enum_values_view: Html, create_enum_btn_view: Html, editing_enum_values_view: Html, field_type_select_view: Html) -> Html {
     html! {
         <div>
             <h3>{"New field: "}{&creating_field.name}</h3>
-            <form class="form-horizontal">
+            <div class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="field-editing_name">{"Name:"}</label>
@@ -253,6 +253,7 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
                             type="text"
                             class="form-input"
                             id="field-editing_name"
+                            required=true
                             value={&creating_field.name}
                             oninput=link.callback(move |input: InputData|
                                 {
@@ -330,6 +331,8 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
                     <div class="col-9 col-sm-12">
                         {create_enum_btn_view}
                         {creating_enum_values_view}
+                        {editing_enum_values_view}
+                        {enum_values_list_view}
                     </div>
                 </div>
 
@@ -341,7 +344,7 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
                         <button class="btn" onclick=link.callback(|_| Msg::CancelNewField)>{"cancel"}</button><button class="btn" onclick=link.callback(|_| Msg::CreateField)>{"save"}</button>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     }
 }
@@ -458,13 +461,12 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
     }
 }
 
-pub fn view_create_enum_btn_container(link: &ComponentLink<App>, view_enum_values_list: Html) -> Html {
+pub fn view_create_enum_btn_container(link: &ComponentLink<App>) -> Html {
     html! {
         <div>
             <button class="btn" onclick=link.callback(|_| Msg::NewEnumValue)>
                 {"New Type value"}
             </button>
-            {view_enum_values_list}
         </div>
     }
 }

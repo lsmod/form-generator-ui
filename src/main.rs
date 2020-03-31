@@ -486,7 +486,7 @@ impl App {
                 },
                 None => html!{}
             };
-            view_enum_values_container(self.view_editing_enum_value(), enum_value_list)
+            view_enum_values_container(html!{}, enum_value_list)
         };
 
         match &self.state.editing_mode {
@@ -511,16 +511,18 @@ impl App {
         match &self.state.editing_mode {
             EditorMode::CreatingField(creating_field) => {
                 let creating_enum_values_view = self.view_creating_enum_values();
+                let editing_enum_values_view = self.view_editing_enum_value();
+                let enum_values_list_view = self.view_enum_values_list();
                 let create_enum_btn_view = match &creating_field.data_type {
                     Radio => {
                         match self.state.creating_enum_value {
-                            Some(_) => html!{{self.view_enum_values_list()}},
-                            None => view_create_enum_btn_container(&self.link, self.view_enum_values_list()),
+                            Some(_) => html!{},
+                            None => view_create_enum_btn_container(&self.link),
                         }
                     }
                     _ => html!{}
                 };
-                view_new_field_container(&self.link, &creating_field, creating_enum_values_view, create_enum_btn_view, self.view_field_type_select(creating_field.data_type.clone()))
+                view_new_field_container(&self.link, &creating_field, enum_values_list_view, creating_enum_values_view, create_enum_btn_view, editing_enum_values_view, self.view_field_type_select(creating_field.data_type.clone()))
             },
             _ => html!{}
         }
@@ -535,7 +537,7 @@ impl App {
                     Radio => {
                         match self.state.creating_enum_value {
                             Some(_) => html!{{self.view_enum_values_list()}},
-                            None => view_create_enum_btn_container(&self.link, self.view_enum_values_list()),
+                            None => view_create_enum_btn_container(&self.link),
                         }
                     }
                     _ => html!{}
