@@ -232,6 +232,7 @@ impl Component for App {
                 };
                 true
             }
+            // TODO: remove validation when updating
             Msg::UpdateFieldType(data_type) => {
                 match &mut self.state.editing_mode {
                     EditorMode::EditingField(editing_field) => editing_field.field.data_type = data_type,
@@ -426,6 +427,7 @@ impl Component for App {
                 self.console.log(format!("{:?}", self.state).as_str());
                 true
             }
+            // TODO remove validation if 1 item in list
             Msg::DeleteEnumValue(index) => {
                 let remove_enum = |field: &mut Field, index: usize| {
                     match &mut field.validation {
@@ -475,18 +477,17 @@ impl App {
 
     fn view_enum_values_list(&self) -> Html {
         let view = |field: &Field| {
-            let enum_value_list = match &field.validation {
+            match &field.validation {
                 Some(validation) => {
                     match &validation.enum_values {
                         Some(enum_values) => {
-                            view_enum_values_list_container(&self.link, enum_values)
+                            view_enum_values_container(view_enum_values_list_container(&self.link, enum_values))
                         },
                         None => html!{}
                     }
                 },
                 None => html!{}
-            };
-            view_enum_values_container(html!{}, enum_value_list)
+            }
         };
 
         match &self.state.editing_mode {
@@ -533,16 +534,19 @@ impl App {
             EditorMode::EditingField(editing_field) => {
                 let field = &editing_field.field;
                 let creating_enum_values_view = self.view_creating_enum_values();
+                let editing_enum_values_view = self.view_editing_enum_value();
+                let enum_values_list_view = self.view_enum_values_list();
                 let create_enum_btn_view = match editing_field.field.data_type {
                     Radio => {
                         match self.state.creating_enum_value {
-                            Some(_) => html!{{self.view_enum_values_list()}},
+                            Some(_) => html!{},
                             None => view_create_enum_btn_container(&self.link),
                         }
                     }
                     _ => html!{}
                 };
-                view_edit_field_container(&self.link, &field, creating_enum_values_view, create_enum_btn_view, self.view_field_type_select(field.data_type.clone()))
+                view_edit_field_container(&self.link, &field, enum_values_list_view, creating_enum_values_view, create_enum_btn_view, editing_enum_values_view, self.view_field_type_select(field.data_type.clone()))
+                // view_edit_field_container(&self.link, &field, creating_enum_values_view, create_enum_btn_view, self.view_field_type_select(field.data_type.clone()))
             },
             _ => html! {}
         }

@@ -229,11 +229,10 @@ pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataTy
     }
 }
 
-pub fn view_enum_values_container(editing_enum_value: Html, enum_values_list: Html) -> Html {
+pub fn view_enum_values_container(enum_values_list: Html) -> Html {
     html!{
         <div>
             <h4>{"Enum values"}</h4>
-            {editing_enum_value}
             {enum_values_list}
         </div>
     }
@@ -349,11 +348,11 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
     }
 }
 
-pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Field, creating_enum_values_view: Html, create_enum_btn_view: Html, field_type_select_view: Html) -> Html {
+pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Field, enum_values_list_view: Html, creating_enum_values_view: Html, create_enum_btn_view: Html, editing_enum_values_view: Html, field_type_select_view: Html) -> Html {
     html! {
         <div>
             <h3>{"Edit field: "}{&creating_field.name}</h3>
-            <form class="form-horizontal">
+            <div class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="field-editing_name">{"Name:"}</label>
@@ -441,6 +440,8 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
                     <div class="col-9 col-sm-12">
                         {create_enum_btn_view}
                         {creating_enum_values_view}
+                        {editing_enum_values_view}
+                        {enum_values_list_view}
                     </div>
                 </div>
 
@@ -453,7 +454,7 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
                         <button class="btn" onclick=link.callback(|_| Msg::UpdateField)>{"save"}</button>
                     </div>
                 </div>
-            </form>
+            </div>
 
 
 
