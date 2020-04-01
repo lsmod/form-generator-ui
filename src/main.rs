@@ -515,6 +515,11 @@ impl App {
                 let editing_enum_values_view = self.view_editing_enum_value();
                 let enum_values_list_view = self.view_enum_values_list();
                 let create_enum_btn_view = match &creating_field.data_type {
+                    Checkbox |
+                    SelectList |
+                    EditableSelectList |
+                    MultiSelectList |
+                    EditableMultiSelectList |
                     Radio => {
                         match self.state.creating_enum_value {
                             Some(_) => html!{},
@@ -537,6 +542,11 @@ impl App {
                 let editing_enum_values_view = self.view_editing_enum_value();
                 let enum_values_list_view = self.view_enum_values_list();
                 let create_enum_btn_view = match editing_field.field.data_type {
+                    Checkbox |
+                    SelectList |
+                    EditableSelectList |
+                    MultiSelectList |
+                    EditableMultiSelectList |
                     Radio => {
                         match self.state.creating_enum_value {
                             Some(_) => html!{},
