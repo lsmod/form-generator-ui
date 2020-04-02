@@ -86,6 +86,8 @@ pub enum Msg {
 
     EditField(usize),
     DeleteField(usize),
+    MoveFieldUp(usize),
+    MoveFieldDown(usize),
     CancelEditField,
     UpdateField,
 
@@ -198,6 +200,18 @@ impl Component for App {
             Msg::DeleteField(index) => {
                 if index < self.state.model.fields.len() {
                     self.state.model.fields.remove(index);
+                }
+                true
+            }
+            Msg::MoveFieldUp(index) => {
+                if index > 0 {
+                    self.state.model.fields.swap(index, index - 1);
+                }
+                true
+            }
+            Msg::MoveFieldDown(index) => {
+                if index < &self.state.model.fields.len() - 1 {
+                    self.state.model.fields.swap(index, index + 1);
                 }
                 true
             }

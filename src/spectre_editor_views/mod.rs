@@ -27,6 +27,7 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html) -> Ht
                       <th>{"Label"}</th>
                       <th>{"Placeholder"}</th>
                       <th>{"Required"}</th>
+                      <th>{"Order"}</th>
                       <th>{"Action"}</th>
                     </tr>
                   </thead>
@@ -147,14 +148,18 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
 fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Html {
     html! {
         <tr>
-          <td>{&field.name}</td>
-          <td>{&field.data_type}</td>
-          <td>{&field.label}</td>
-          <td>{&field.placeholder}</td>
-          <td>{&field.required}</td>
-          <td>
-            <button class="btn" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
-            <button class="btn" onclick=link.callback(move |_| Msg::DeleteField(index))><i class="icon icon-cross"></i> {" Delete"}</button>
+            <td>{&field.name}</td>
+            <td>{&field.data_type}</td>
+            <td>{&field.label}</td>
+            <td>{&field.placeholder}</td>
+            <td>{&field.required}</td>
+            <td>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveFieldDown(index))><i class="icon icon-arrow-down"></i></button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveFieldUp(index))><i class="icon icon-arrow-up"></i></button>
+            </td>
+            <td>
+                <button class="btn" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
+                <button class="btn" onclick=link.callback(move |_| Msg::DeleteField(index))><i class="icon icon-cross"></i> {" Delete"}</button>
             </td>
         </tr>
     }
