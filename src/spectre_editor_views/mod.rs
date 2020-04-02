@@ -1,19 +1,19 @@
-use crate::form_model::form_model::Model;
-use crate::form_model::form_model::FieldDataType;
 use crate::form_model::form_model::EnumValues;
 use crate::form_model::form_model::Field;
+use crate::form_model::form_model::FieldDataType;
+use crate::form_model::form_model::Model;
 
-use yew::{Html, html, ComponentLink};
-use yew::html::InputData;
-use yew::components::Select;
 use strum::IntoEnumIterator;
+use yew::components::Select;
+use yew::html::InputData;
+use yew::{html, ComponentLink, Html};
 
 use crate::App;
-use crate::Msg;
 use crate::EditingEnumValue;
+use crate::Msg;
 
 // TODO: add cancel save (when creating editing enum values)
-pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html ) -> Html {
+pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html) -> Html {
     html! {
         <div>
             { top_view }
@@ -40,8 +40,16 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html ) -> H
 }
 
 pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
-    let model_subtitle: String = if let Some(model_subtitle) = &model.subtitle { model_subtitle.clone() } else { "".to_string() };
-    let model_title: String = if let Some(model_title) = &model.title { model_title.clone() } else { "".to_string() };
+    let model_subtitle: String = if let Some(model_subtitle) = &model.subtitle {
+        model_subtitle.clone()
+    } else {
+        "".to_string()
+    };
+    let model_title: String = if let Some(model_title) = &model.title {
+        model_title.clone()
+    } else {
+        "".to_string()
+    };
 
     html! {
         <div>
@@ -148,7 +156,10 @@ fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Ht
     }
 }
 
-pub fn view_enum_values_list_container(link: &ComponentLink<App>, enum_values: &Vec<EnumValues>) -> Html {
+pub fn view_enum_values_list_container(
+    link: &ComponentLink<App>,
+    enum_values: &Vec<EnumValues>,
+) -> Html {
     html! {
         <table class="table table-striped table-hover">
           <thead>
@@ -189,8 +200,11 @@ fn view_enum_values_item(link: &ComponentLink<App>, index: usize, enum_value: &E
     }
 }
 
-pub fn view_editing_enum_value(link: &ComponentLink<App>, editing_enum_value: &EditingEnumValue) -> Html {
-    html!{
+pub fn view_editing_enum_value(
+    link: &ComponentLink<App>,
+    editing_enum_value: &EditingEnumValue,
+) -> Html {
+    html! {
         <div>
             <h4>{"Editing Enum value"}</h4>
             <div class="form-group">
@@ -235,7 +249,7 @@ pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataTy
 }
 
 pub fn view_enum_values_container(enum_values_list: Html) -> Html {
-    html!{
+    html! {
         <div>
             <h4>{"Enum values"}</h4>
             {enum_values_list}
@@ -243,7 +257,15 @@ pub fn view_enum_values_container(enum_values_list: Html) -> Html {
     }
 }
 
-pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Field, enum_values_list_view: Html, creating_enum_values_view: Html, create_enum_btn_view: Html, editing_enum_values_view: Html, field_type_select_view: Html) -> Html {
+pub fn view_new_field_container(
+    link: &ComponentLink<App>,
+    creating_field: &Field,
+    enum_values_list_view: Html,
+    creating_enum_values_view: Html,
+    create_enum_btn_view: Html,
+    editing_enum_values_view: Html,
+    field_type_select_view: Html,
+) -> Html {
     html! {
         <div>
             <h3>{"New field: "}{&creating_field.name}</h3>
@@ -354,7 +376,15 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
     }
 }
 
-pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Field, enum_values_list_view: Html, creating_enum_values_view: Html, create_enum_btn_view: Html, editing_enum_values_view: Html, field_type_select_view: Html) -> Html {
+pub fn view_edit_field_container(
+    link: &ComponentLink<App>,
+    creating_field: &Field,
+    enum_values_list_view: Html,
+    creating_enum_values_view: Html,
+    create_enum_btn_view: Html,
+    editing_enum_values_view: Html,
+    field_type_select_view: Html,
+) -> Html {
     html! {
         <div>
             <h3>{"Edit field: "}{&creating_field.name}</h3>
@@ -461,9 +491,6 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     }
 }
@@ -478,8 +505,11 @@ pub fn view_create_enum_btn_container(link: &ComponentLink<App>) -> Html {
     }
 }
 
-pub fn view_creating_enum_values(link: &ComponentLink<App>, creating_enum_value: &EnumValues) -> Html {
-    html!{
+pub fn view_creating_enum_values(
+    link: &ComponentLink<App>,
+    creating_enum_value: &EnumValues,
+) -> Html {
+    html! {
         <div>
             <h5>{"creating enum"}</h5>
             <div class="form-group">

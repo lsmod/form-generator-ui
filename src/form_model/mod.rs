@@ -13,7 +13,6 @@ pub mod form_model {
         pub value: String,
         pub label: String,
     }
-    
     #[derive(Deserialize, Debug, Clone)]
     pub struct Validation {
         pub min_length: Option<u8>,
