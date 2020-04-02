@@ -123,7 +123,7 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
                     <div class="form-group">
                         <div class="col-3 col-sm-12"></div>
                         <div class="col-9 col-sm-12">
-                            <button class="btn" onclick=link.callback(|_| Msg::NewField)>{"New field"}</button>
+                            <button class="btn" onclick=link.callback(|_| Msg::NewField)><i class="icon icon-plus"></i> {" New field "}</button>
                         </div>
                     </div>
                 </form>
@@ -141,8 +141,8 @@ fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Ht
           <td>{&field.placeholder}</td>
           <td>{&field.required}</td>
           <td>
-            <button class="btn" onclick=link.callback(move |_| Msg::EditField(index))>{"edit"}</button>
-            <button class="btn">{"delete"}</button>
+            <button class="btn" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
+            <button class="btn"><i class="icon icon-cross"></i> {" Delete"}</button>
             </td>
         </tr>
     }
@@ -182,8 +182,8 @@ fn view_enum_values_item(link: &ComponentLink<App>, index: usize, enum_value: &E
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueUp(index))><i class="icon icon-arrow-up"></i></button>
             </td>
             <td>
-                <button class="btn" type="button" onclick=link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
-                <button class="btn" type="button" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::EditFieldEnumValues(index))><i class="icon icon-edit"></i>{" Edit"}</button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))><i class="icon icon-cross"></i> {" Delete"}</button>
             </td>
         </tr>
     }
@@ -215,8 +215,8 @@ pub fn view_editing_enum_value(link: &ComponentLink<App>, editing_enum_value: &E
                                         Msg::UpdateEnumValueLabel(input.value)
                                     })
                 />
-                <button class="btn" type="button" onclick=link.callback(|_| Msg::CancelEditEnumValues)>{"cancel"}</button>
-                <button class="btn" type="button" onclick=link.callback(|_| Msg::UpdateFieldEnumValues)>{"save"}</button>
+                <button class="btn" type="button" onclick=link.callback(|_| Msg::CancelEditEnumValues)><i class="icon icon-stop"></i> {" Cancel"}</button>
+                <button class="btn" type="button" onclick=link.callback(|_| Msg::UpdateFieldEnumValues)><i class="icon icon-check"></i> {" Save"}</button>
             </div>
         </div>
     }
@@ -345,7 +345,8 @@ pub fn view_new_field_container(link: &ComponentLink<App>, creating_field: &Fiel
 
                     </div>
                     <div class="col-9 col-sm-12">
-                        <button class="btn" onclick=link.callback(|_| Msg::CancelNewField)>{"cancel"}</button><button class="btn" onclick=link.callback(|_| Msg::CreateField)>{"save"}</button>
+                        <button class="btn" onclick=link.callback(|_| Msg::CancelNewField)><i class="icon icon-stop"></i>{" Cancel"}</button>
+                        <button class="btn" onclick=link.callback(|_| Msg::CreateField)><i class="icon icon-check"></i>{" Save"}</button>
                     </div>
                 </div>
             </div>
@@ -455,8 +456,8 @@ pub fn view_edit_field_container(link: &ComponentLink<App>, creating_field: &Fie
 
                     </div>
                     <div class="col-9 col-sm-12">
-                        <button class="btn" onclick=link.callback(|_| Msg::CancelEditField)>{"cancel"}</button>
-                        <button class="btn" onclick=link.callback(|_| Msg::UpdateField)>{"save"}</button>
+                        <button class="btn" onclick=link.callback(|_| Msg::CancelEditField)><i class="icon icon-stop"></i> {" Cancel"}</button>
+                        <button class="btn" onclick=link.callback(|_| Msg::UpdateField)><i class="icon icon-check"></i> {" Save"}</button>
                     </div>
                 </div>
             </div>
@@ -471,7 +472,7 @@ pub fn view_create_enum_btn_container(link: &ComponentLink<App>) -> Html {
     html! {
         <div>
             <button class="btn" onclick=link.callback(|_| Msg::NewEnumValue)>
-                {"New Type value"}
+                <i class="icon icon-plus"></i> {" New Type value"}
             </button>
         </div>
     }
@@ -508,7 +509,7 @@ pub fn view_creating_enum_values(link: &ComponentLink<App>, creating_enum_value:
                 />
             </div>
             <button class="btn" onclick=link.callback(|_| Msg::CreateNewEnumValue)>
-                {"add"}
+                <i class="icon icon-plus"></i> {" Add"}
             </button>
         </div>
     }
