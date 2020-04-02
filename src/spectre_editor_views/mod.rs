@@ -15,7 +15,7 @@ use crate::Msg;
 // TODO: add cancel save (when creating editing enum values)
 pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html) -> Html {
     html! {
-        <div>
+        <div style="margin-left: 5vw; margin-right: 5vw; margin-top: 20px;">
             { top_view }
             <div class="model-field-container">
                 <h2>{"Fields"}</h2>
@@ -214,8 +214,8 @@ pub fn view_editing_enum_value(
     editing_enum_value: &EditingEnumValue,
 ) -> Html {
     html! {
-        <div>
-            <h4>{"Editing Enum value"}</h4>
+        <div style="margin-top: 15px;">
+            <h3>{"Editing Enum value"}</h3>
             <div class="form-group">
                 <label class="form-label" for="input-editing-enum-value">{"Value: "}</label>
                 <input
@@ -259,8 +259,8 @@ pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataTy
 
 pub fn view_enum_values_container(enum_values_list: Html) -> Html {
     html! {
-        <div>
-            <h4>{"Enum values"}</h4>
+        <div  style="margin-top: 15px;">
+            <h3>{"Enum values"}</h3>
             {enum_values_list}
         </div>
     }
@@ -277,7 +277,7 @@ pub fn view_new_field_container(
 ) -> Html {
     html! {
         <div>
-            <h3>{"New field: "}{&creating_field.name}</h3>
+            <h1>{"New field: "}{&creating_field.name}</h1>
             <div class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
@@ -396,7 +396,7 @@ pub fn view_edit_field_container(
 ) -> Html {
     html! {
         <div>
-            <h3>{"Edit field: "}{&creating_field.name}</h3>
+            <h1>{"Edit field: "}{&creating_field.name}</h1>
             <div class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
@@ -520,7 +520,7 @@ pub fn view_creating_enum_values(
 ) -> Html {
     html! {
         <div>
-            <h5>{"creating enum"}</h5>
+            <h3>{"New enum"}</h3>
             <div class="form-group">
                 <label for="creating-enum_label" class="form-label">{"Label:"}</label>
                 <input
