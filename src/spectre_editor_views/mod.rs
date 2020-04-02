@@ -155,6 +155,7 @@ pub fn view_enum_values_list_container(link: &ComponentLink<App>, enum_values: &
             <tr>
               <th>{"Value"}</th>
               <th>{"Label"}</th>
+              <th>{"Order"}</th>
               <th>{"Edit"}</th>
             </tr>
           </thead>
@@ -176,6 +177,10 @@ fn view_enum_values_item(link: &ComponentLink<App>, index: usize, enum_value: &E
         <tr>
             <td>{&enum_value.value}</td>
             <td>{&enum_value.label}</td>
+            <td>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueDown(index))><i class="icon icon-arrow-down"></i></button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueUp(index))><i class="icon icon-arrow-up"></i></button>
+            </td>
             <td>
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::EditFieldEnumValues(index))>{"edit"}</button>
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))>{"delete"}</button>

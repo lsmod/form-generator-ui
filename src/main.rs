@@ -110,12 +110,14 @@ pub enum Msg {
     CreateNewEnumValue, // click save new enum value
     UpdateNewEnumValueValue(String), // this is when adding a new field
     UpdateNewEnumValueLabel(String),
+    MoveEnumValueUp(usize),
+    MoveEnumValueDown(usize),
     /*
-    MoveFieldUp
-    MoveFieldDown
+
 
     RemoveField,
     DeleteField,
+
 
 
     NewListValue,
@@ -452,8 +454,67 @@ impl Component for App {
                 }
                 true
             }
+            Msg::MoveEnumValueUp(index) => {
+                let move_up = |field: &mut Field, index: usize| {
+                    if index > 0 {
+                        match &mut field.validation {
+                            Some(validation) => {
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {
+                                        if enum_values.len() > 1 {
+                                            enum_values.swap(index, index -1);
+                                        }
+                                    },
+                                    None => ()
+                                }
+                            }
+                            None => (),
+                        }
+                    }
+                };
+
+                match &mut self.state.editing_mode {
+                    EditorMode::CreatingField(creating_field) => {
+                        move_up(creating_field, index)
+                    },
+                    EditorMode::EditingField(editing_field) => {
+                        move_up(&mut editing_field.field, index)
+                    },
+                    _ => (),
+                }
+                true
+            }
+            Msg::MoveEnumValueDown(index) => {
+                let move_down = |field: &mut Field, index: usize| {
+                        match &mut field.validation {
+                            Some(validation) => {
+                                match &mut validation.enum_values {
+                                    Some(enum_values) => {
+                                        if index < enum_values.len() - 1 && enum_values.len() > 1 {
+                                            enum_values.swap(index, index + 1);
+                                        }
+                                    },
+                                    None => ()
+                                }
+                            }
+                            None => (),
+                        }
+                };
+
+                match &mut self.state.editing_mode {
+                    EditorMode::CreatingField(creating_field) => {
+                        move_down(creating_field, index)
+                    },
+                    EditorMode::EditingField(editing_field) => {
+                        move_down(&mut editing_field.field, index)
+                    },
+                    _ => (),
+                }
+                true
+            }
         }
     }
+
 
     fn view(&self) -> Html {
         let top_view = match &self.state.editing_mode {
