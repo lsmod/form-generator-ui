@@ -31,7 +31,11 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, top_view: Html) -> Ht
                     </tr>
                   </thead>
                   <tbody>
-                  { for model.fields.iter().enumerate().map(|(index, field)| view_field_item(link, index, field)) }
+                  { for model.fields
+                      .iter()
+                      .enumerate()
+                      .map(|(index, field)| view_field_item(link, index, field))
+                  }
                   </tbody>
                 </table>
             </div>
@@ -150,7 +154,7 @@ fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Ht
           <td>{&field.required}</td>
           <td>
             <button class="btn" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
-            <button class="btn"><i class="icon icon-cross"></i> {" Delete"}</button>
+            <button class="btn" onclick=link.callback(move |_| Msg::DeleteField(index))><i class="icon icon-cross"></i> {" Delete"}</button>
             </td>
         </tr>
     }

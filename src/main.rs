@@ -84,7 +84,8 @@ pub enum Msg {
     UpdateSubtitle(String),
     UpdateSubmitLabel(String),
 
-    EditField(usize), // TODO display enum_value if type = radio
+    EditField(usize),
+    DeleteField(usize),
     CancelEditField,
     UpdateField,
 
@@ -192,6 +193,12 @@ impl Component for App {
                     field: self.state.model.fields[index].clone(),
                     id: index,
                 });
+                true
+            }
+            Msg::DeleteField(index) => {
+                if index < self.state.model.fields.len() {
+                    self.state.model.fields.remove(index);
+                }
                 true
             }
             Msg::CancelEditField => {
