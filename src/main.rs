@@ -62,6 +62,17 @@ pub struct State {
     editing_mode: EditorMode,
     model: Model,
 }
+
+impl Default for State {
+    fn default() -> Self {
+        State {
+            editing_mode: EditorMode::Listing,
+            editing_enum_value: None,
+            creating_enum_value: None,
+            model: Model::default(),
+        }
+    }
+}
 // TODO:
 // bug: click on edit enum value -> show edit then redirect to home without saving
 // - separator
@@ -144,31 +155,10 @@ impl Component for App {
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let mut fields = vec![];
-        fields.push(Field {
-            name: "username".to_string(),
-            data_type: Text,
-            label: "Your name".to_string(),
-            required: false,
-            placeholder: "Enter your username".to_string(),
-            validation: None,
-        });
         App {
             link,
             console: ConsoleService::new(),
-            state: State {
-                // TODO : create a builder for this
-                editing_mode: EditorMode::Listing,
-                editing_enum_value: None,
-                creating_enum_value: None,
-                model: Model {
-                    name: "React-Native".to_string(),
-                    title: Some("new title".to_string()),
-                    submit_label: "send".to_string(),
-                    subtitle: Some("a model to generate react-native forms".to_string()),
-                    fields: fields,
-                },
-            },
+            state: State::default()
         }
     }
 

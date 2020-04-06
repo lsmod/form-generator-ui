@@ -1,5 +1,5 @@
 pub mod form_model {
-    #[derive(Deserialize, Debug, Clone)]
+    #[derive(Deserialize, Debug, Clone, Default)]
     pub struct Model {
         pub name: String,
         pub submit_label: String,
@@ -8,12 +8,12 @@ pub mod form_model {
         pub fields: Vec<Field>,
     }
 
-    #[derive(Deserialize, Debug, Clone)]
+    #[derive(Deserialize, Debug, Clone, Default)]
     pub struct EnumValues {
         pub value: String,
         pub label: String,
     }
-    #[derive(Deserialize, Debug, Clone)]
+    #[derive(Deserialize, Debug, Clone, Default)]
     pub struct Validation {
         pub min_length: Option<u8>,
         pub max_length: Option<u8>,
@@ -38,13 +38,19 @@ pub mod form_model {
         EditableMultiSelectList,
     }
 
+    impl Default for FieldDataType {
+        fn default() -> Self {
+            FieldDataType::Text
+        }
+    }
+
     impl std::fmt::Display for FieldDataType {
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             write!(f, "{:?}", self)
         }
     }
 
-    #[derive(Deserialize, Debug, Clone)]
+    #[derive(Deserialize, Debug, Clone, Default)]
     pub struct Field {
         #[serde(rename = "type")]
         /// type of data
