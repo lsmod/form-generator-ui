@@ -125,6 +125,8 @@ pub enum Msg {
     UpdateNewEnumValueLabel(String),
     MoveEnumValueUp(usize),
     MoveEnumValueDown(usize),
+
+    NewGenerate,
     /*
 
 
@@ -519,6 +521,9 @@ impl Component for App {
                     }
                     _ => (),
                 }
+                true
+            }
+            Msg::NewGenerate => {
                 true
             }
         }

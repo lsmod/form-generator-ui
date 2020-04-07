@@ -60,7 +60,7 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
         <div>
             <h1>{"Model: "}{&model.name}</h1>
             <div>
-                <form class="form-horizontal">
+                <div class="form-horizontal">
                     <div class="form-group">
                         <div class="col-3 col-sm-12">
                             <label class="form-label" for="input_model-name">{"Name: "}</label>
@@ -136,10 +136,17 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
                     <div class="form-group">
                         <div class="col-3 col-sm-12"></div>
                         <div class="col-9 col-sm-12">
-                            <button class="btn btn-primary" onclick=link.callback(|_| Msg::NewField)><i class="icon icon-plus"></i> {" New field "}</button>
+                            <div class="columns">
+                                <div class="column col-3 col-mr-auto">
+                                    <button class="btn btn-primary" onclick=link.callback(|_| Msg::NewField)><i class="icon icon-plus"></i> {" New field "}</button>
+                                </div>
+                                <div class="column col-2 col-ml-auto">
+                                    <button class="btn btn-primary" onclick=link.callback(|_| Msg::NewGenerate)><i class="icon icon-plus"></i> {" Generate "}</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     }
