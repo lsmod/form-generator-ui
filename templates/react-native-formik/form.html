@@ -1,0 +1,17 @@
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
+  <ion-list>
+    <!-- TODO: add header (title, subtitle), deal with radio value -->
+  {%- for field in fields %}
+  <ion-item>
+    <ion-label position="stacked">{{field.label}}</ion-label>
+    <{{field.html_element}}
+      formControlName="{{field.name}}Control"
+      placeholder="{{field.placeholder}}"
+      type="{{field.input_type}}"
+      {% if field.required %}required="true"{%- endif -%}
+    >
+    </{{field.html_element}}>
+  </ion-item>
+  {%- endfor %}
+  </ion-list>
+</form>

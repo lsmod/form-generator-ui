@@ -8,6 +8,7 @@ extern crate serde;
 extern crate serde_json;
 
 mod spectre_editor_views;
+use askama::Template;
 use crate::spectre_editor_views::main_view;
 use crate::spectre_editor_views::view_create_enum_btn_container;
 use crate::spectre_editor_views::view_creating_enum_values;
@@ -26,8 +27,8 @@ mod form_model;
 pub use form_model::form_model::FieldDataType::*;
 pub use form_model::form_model::*;
 
-mod react_native;
-pub use react_native::to_html_type;
+mod react_native_formik;
+pub use react_native_formik::form_template::FormTemplate;
 
 #[derive(Debug)]
 pub struct EditingEnumValue {
@@ -524,6 +525,8 @@ impl Component for App {
                 true
             }
             Msg::NewGenerate => {
+                let form_template = FormTemplate::from(&self.state.model);
+                self.console.log(format!("{}", form_template.render().unwrap()).as_str());
                 true
             }
         }
