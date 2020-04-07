@@ -36,6 +36,12 @@ pub struct EditingEnumValue {
     enum_value: EnumValues,
 }
 
+#[derive(Default, Debug)]
+pub struct GeneratedFile {
+    file_name: String,
+    content: String,
+}
+
 #[derive(Debug)]
 struct EditingField {
     id: usize,
@@ -62,6 +68,7 @@ pub struct State {
     creating_enum_value: Option<EnumValues>,
     editing_mode: EditorMode,
     model: Model,
+    generated_files: Vec<GeneratedFile>
 }
 
 impl Default for State {
@@ -70,6 +77,7 @@ impl Default for State {
             editing_mode: EditorMode::Listing,
             editing_enum_value: None,
             creating_enum_value: None,
+            generated_files: vec!(),
             model: Model::default(),
         }
     }
@@ -526,7 +534,12 @@ impl Component for App {
             }
             Msg::NewGenerate => {
                 let form_template = FormTemplate::from(&self.state.model);
-                self.console.log(format!("{}", form_template.render().unwrap()).as_str());
+                self.state.generated_files = vec!();
+                self.state.generated_files.push(GeneratedFile {
+                    file_name: "form.html".to_string(),
+                    content: form_template.render().unwrap()
+                });
+                self.console.log(format!("file: {}\ncontent: \n{}", self.state.generated_files[0].file_name, self.state.generated_files[0].content).as_str());
                 true
             }
         }
