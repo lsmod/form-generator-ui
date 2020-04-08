@@ -93,6 +93,7 @@ export default validate;
           <Form>
             {%- for field in fields %}
             {# TODO picker textarea input with autocompletion #}
+            {# TODO match on type: password secureTextEntry, radio: picker; list; picker, #}
             <Item floatingLabel error={!!errors['{= field.name =}']}>
               <Label>{errors.{= field.name =} || '{= field.label =}'}</Label>
               <Input
