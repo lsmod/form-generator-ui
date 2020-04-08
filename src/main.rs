@@ -6,6 +6,8 @@ extern crate strum_macros;
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
+extern crate askama;
+extern crate inflector;
 
 mod spectre_editor_views;
 use askama::Template;

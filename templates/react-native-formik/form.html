@@ -1,17 +1,95 @@
-<form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
-  <ion-list>
-    <!-- TODO: add header (title, subtitle), deal with radio value -->
-  {%- for field in fields %}
-  <ion-item>
-    <ion-label position="stacked">{{field.label}}</ion-label>
-    <{{field.html_element}}
-      formControlName="{{field.name}}Control"
-      placeholder="{{field.placeholder}}"
-      type="{{field.input_type}}"
-      {% if field.required %}required="true"{%- endif -%}
-    >
-    </{{field.html_element}}>
-  </ion-item>
-  {%- endfor %}
-  </ion-list>
-</form>
+import * as React from 'react';
+import { Formik } from 'formik';
+import {
+  Content,
+  Button,
+  Container,
+  Form,
+  Item, {# TODO adds import form field #}
+} from 'native-base';
+
+const {= name =}Page: React.FC<> = () => {
+  // TODO: const store = useMyStore();
+  const isSending = store.state.isSending;
+  const defaultValue = {
+    {%- for field in fields %}
+    {= field.name =}: '',
+    {%- endfor %}
+  }
+
+  const onSubmit = (data: any) => {
+    Keyboard.dismiss();
+    // TODO dispatch some action with form data
+  };
+
+  {# TODO validation #}
+
+  return (
+    <Formik
+      initialValues={{ ...defaultValue }}
+      validate={newPlaintValidation}
+      onSubmit={values => onSubmit(values)}>
+      {({
+        values,
+        errors,
+        handleChange,
+        isValid,
+        handleSubmit,
+        setFieldValue,
+        dirty,
+      }) => (
+      <Container>
+        <Header>
+            <Left />
+            <Body>
+              <Title>
+                {%- match title -%}
+                {%- when Some with (my_title) -%}
+                {= my_title =}
+                {%- when None -%}
+                {%- endmatch -%}
+              </Title>
+            </Body>
+            <Right>
+              <Button
+                hasText
+                transparent
+                onPress={handleSubmit}
+                disabled={!dirty || !isValid}
+                style={{ paddingLeft: 0 }}>
+                {isSending ? (
+                  <Spinner color="#007aff" size={25} />
+                ) : (
+                  <Text
+                    style={{
+                      fontWeight: '600',
+                      width: '100%',
+                      paddingLeft: 0,
+                      textAlign: 'right',
+                    }}>
+                    {= submit_label =}
+                  </Text>
+                )}
+              </Button>
+            </Right>
+          </Header>
+        <Content padder>
+          <Form>
+            {%- for field in fields %}
+            {# TODO picker textarea input with autocompletion #}
+            <Item floatingLabel error={!!errors['{= field.name =}']}>
+              <Label>{errors.{= field.name =} || '{= field.label =}'}</Label>
+              <Input
+                value={values.{= field.name =}}
+                onChangeText={handleChange('{= field.name =}')}
+                placeholder="{= field.placeholder =}"
+              />
+            </Item>
+            {%- endfor %}
+          </Form>
+        </Content>
+      </Container>
+      )}
+    </Formik>
+  );
+}

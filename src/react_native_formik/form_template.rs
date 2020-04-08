@@ -2,7 +2,7 @@ use askama::Template;
 use crate::form_model::form_model::*;
 use crate::react_native_formik::helpers::to_input_type;
 use crate::react_native_formik::helpers::to_html_type;
-
+use crate::inflector::Inflector;
 
 
 /// Field with added informations needed for template generation
@@ -33,6 +33,8 @@ impl<'a> From<&'a Field> for TemplateField<'a> {
 #[derive(Template)]
 #[template (path = "react-native-formik/form.html", escape = "none")]
 pub struct FormTemplate<'a> {
+    name: String,
+    submit_label: &'a String,
     title: &'a Option<String>,
     subtitle: &'a Option<String>,
     fields: Vec<TemplateField<'a>>
@@ -45,6 +47,8 @@ impl<'a> From<& 'a Model> for FormTemplate<'a> {
                                 .map(|field| TemplateField::from(field))
                                 .collect();
         FormTemplate {
+            name: model.name.to_class_case(),
+            submit_label: &model.submit_label,
             title: &model.title,
             subtitle: &model.subtitle,
             fields: new_fields
