@@ -4,13 +4,12 @@ extern crate strum;
 extern crate strum_macros;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
-extern crate serde_json;
 extern crate askama;
 extern crate inflector;
+extern crate serde;
+extern crate serde_json;
 
 mod spectre_editor_views;
-use askama::Template;
 use crate::spectre_editor_views::main_view;
 use crate::spectre_editor_views::view_create_enum_btn_container;
 use crate::spectre_editor_views::view_creating_enum_values;
@@ -21,6 +20,7 @@ use crate::spectre_editor_views::view_enum_values_container;
 use crate::spectre_editor_views::view_enum_values_list_container;
 use crate::spectre_editor_views::view_field_type_select;
 use crate::spectre_editor_views::view_new_field_container;
+use askama::Template;
 
 use yew::services::ConsoleService;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
@@ -70,7 +70,7 @@ pub struct State {
     creating_enum_value: Option<EnumValues>,
     editing_mode: EditorMode,
     model: Model,
-    generated_files: Vec<GeneratedFile>
+    generated_files: Vec<GeneratedFile>,
 }
 
 impl Default for State {
@@ -79,8 +79,52 @@ impl Default for State {
             editing_mode: EditorMode::Listing,
             editing_enum_value: None,
             creating_enum_value: None,
-            generated_files: vec!(),
-            model: Model::default(),
+            generated_files: vec![],
+            model: Model {
+                name: "profile".to_string(),
+                title: Some("Édition du profil".to_string()),
+                subtitle: None,
+                submit_label: "Mettre à jour".to_string(),
+                fields: vec![
+                    Field {
+                        data_type: FieldDataType::Text,
+                        name: "nickname".to_string(),
+                        label: "Your nickname".to_string(),
+                        placeholder: "Enter you nickname".to_string(),
+                        validation: None,
+                        required: true,
+                    },
+                    Field {
+                        data_type: FieldDataType::Email,
+                        name: "email".to_string(),
+                        label: "Your email".to_string(),
+                        placeholder: "Enter you email".to_string(),
+                        validation: None,
+                        required: true,
+                    },
+                    Field {
+                        data_type: FieldDataType::Radio,
+                        name: "sex".to_string(),
+                        label: "Your gender".to_string(),
+                        placeholder: "Select your gender".to_string(),
+                        validation: Some(Validation {
+                            min_length: None,
+                            max_length: None,
+                            enum_values: Some(vec![
+                                EnumValues {
+                                    value: "M".to_string(),
+                                    label: "Male".to_string(),
+                                },
+                                EnumValues {
+                                    value: "F".to_string(),
+                                    label: "Female".to_string(),
+                                },
+                            ]),
+                        }),
+                        required: true,
+                    },
+                ],
+            },
         }
     }
 }
@@ -171,7 +215,7 @@ impl Component for App {
         App {
             link,
             console: ConsoleService::new(),
-            state: State::default()
+            state: State::default(),
         }
     }
 
@@ -536,12 +580,19 @@ impl Component for App {
             }
             Msg::NewGenerate => {
                 let form_template = FormTemplate::from(&self.state.model);
-                self.state.generated_files = vec!();
+                self.state.generated_files = vec![];
                 self.state.generated_files.push(GeneratedFile {
                     file_name: "form.html".to_string(),
-                    content: form_template.render().unwrap()
+                    content: form_template.render().unwrap(),
                 });
-                self.console.log(format!("file: {}\ncontent: \n{}", self.state.generated_files[0].file_name, self.state.generated_files[0].content).as_str());
+                self.console.log(
+                    format!(
+                        "file: {}\ncontent: \n{}",
+                        self.state.generated_files[0].file_name,
+                        self.state.generated_files[0].content
+                    )
+                    .as_str(),
+                );
                 true
             }
         }
