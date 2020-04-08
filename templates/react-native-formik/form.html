@@ -22,12 +22,28 @@ const {= name =}Page: React.FC<> = () => {
     // TODO dispatch some action with form data
   };
 
+  const validate = (values: any) => {
+    const errors: any = {};
+    const minLength = 6;
+    {% for field in fields %}
+      {%- if field.required %}
+    if (!values.newPassword) {
+      errors.{= field.name =} = '{= field.label =} est requis';
+    }
+      {% endif %}
+    {%- endfor %}
+
+    return errors;
+  };
+
+export default validate;
+
   {# TODO validation #}
 
   return (
     <Formik
       initialValues={{ ...defaultValue }}
-      validate={newPlaintValidation}
+      validate={validate}
       onSubmit={values => onSubmit(values)}>
       {({
         values,
