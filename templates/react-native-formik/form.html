@@ -27,9 +27,30 @@ const {= name =}Page: React.FC<> = () => {
     const minLength = 6;
     {% for field in fields %}
       {%- if field.required %}
-    if (!values.newPassword) {
+    if (!values.{= field.name =}) {
       errors.{= field.name =} = '{= field.label =} est requis';
     }
+      {%- match field.validation -%}
+      {%- when Some with (validator) -%}
+        {%- match validator.min_length %}
+        {%- when Some with (min) %}
+    else if (values.{= field.name =}.length < {=min =}) {
+      errors.lastName = 'Minimum {= min =} caractères';
+    }
+        {%- when None %}
+        {%- endmatch %}
+
+        {%- match validator.max_length %}
+        {%- when Some with (max) %}
+    else if (values.{= field.name =}.length > {= max =}) {
+      errors.lastName = 'Maximum {= max =} caractères';
+    }
+        {%- when None %}
+        {%- endmatch %}
+
+      {%- when None -%}
+      {%- endmatch %}
+
       {% endif %}
     {%- endfor %}
 

@@ -91,7 +91,11 @@ impl Default for State {
                         name: "nickname".to_string(),
                         label: "Your nickname".to_string(),
                         placeholder: "Enter you nickname".to_string(),
-                        validation: None,
+                        validation: Some( Validation {
+                            min_length: Some(6),
+                            max_length: Some(30),
+                            enum_values: None,
+                        }),
                         required: true,
                     },
                     Field {
