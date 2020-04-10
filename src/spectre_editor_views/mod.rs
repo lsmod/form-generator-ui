@@ -282,6 +282,9 @@ pub fn view_new_field_container(
     editing_enum_values_view: Html,
     field_type_select_view: Html,
 ) -> Html {
+    let min_length_view = view_min_length_editor(link, creating_field);
+    let max_length_view = view_max_length_editor(link, creating_field);
+
     html! {
         <div>
             <h1>{"New field: "}{&creating_field.name}</h1>
@@ -360,6 +363,23 @@ pub fn view_new_field_container(
 
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
+                        {"Validation :"}
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {min_length_view}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {max_length_view}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
                         <label class="form-label" for="field-editing_name">{"Type:"}</label>
                     </div>
                     <div class="col-9 col-sm-12">
@@ -392,6 +412,131 @@ pub fn view_new_field_container(
     }
 }
 
+// TODO only for text, email, password, url, phone, EditableSelectList, EditableMultiSelectList
+fn view_min_length_editor(link: &ComponentLink<App>, field: &Field) -> Html {
+    match &field.validation {
+        Some(validation) => match validation.min_length {
+            Some(min_length) => html! {
+                <table>
+                    <tr>
+                        <td>
+                            <label class="form-checkbox" for="field-editing_min_length">
+                                <input
+                                    type="checkbox"
+                                    class="form-checkbox"
+                                    id="field-editing_min_length"
+                                    onclick=link.callback(|_| Msg::ToogleMinLength)
+                                    checked=true />
+                                <i class="form-icon"></i>{"Min Length"}
+                            </label>
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                class="form-input"
+                                value={min_length}
+                                min="0"
+                                oninput=link.callback(move |input: InputData|
+                                    {
+                                        let length : usize = match input.value.parse() {
+                                            Ok(len) => len,
+                                            Err(_) => 0
+                                        };
+                                        Msg::UpdateMinLength(length)
+                                    })
+                            />
+                        </td>
+                    </tr>
+                </table>
+            },
+            None => html! {
+                <label class="form-checkbox" for="field-editing_min_length">
+                    <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="field-editing_min_length"
+                        onclick=link.callback(|_| Msg::ToogleMinLength)
+                        checked=false />
+                    <i class="form-icon"></i>{"Min Length"}
+                </label>
+            },
+        },
+        None => html! {
+            <label class="form-checkbox" for="field-editing_min_length">
+                <input
+                    type="checkbox"
+                    class="form-checkbox"
+                    id="field-editing_min_length"
+                    onclick=link.callback(|_| Msg::ToogleMinLength)
+                    checked=false />
+                <i class="form-icon"></i>{"Min Length"}
+            </label>
+        },
+    }
+}
+
+fn view_max_length_editor(link: &ComponentLink<App>, field: &Field) -> Html {
+    match &field.validation {
+        Some(validation) => match validation.max_length {
+            Some(max_length) => html! {
+                <table>
+                    <tr>
+                        <td>
+                            <label class="form-checkbox" for="field-editing_max_length">
+                                <input
+                                    type="checkbox"
+                                    class="form-checkbox"
+                                    id="field-editing_max_length"
+                                    onclick=link.callback(|_| Msg::ToogleMaxLength)
+                                    checked=true />
+                                <i class="form-icon"></i>{"Max Length"}
+                            </label>
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                class="form-input"
+                                value={max_length}
+                                min="0"
+                                oninput=link.callback(move |input: InputData|
+                                    {
+                                        let length : usize = match input.value.parse() {
+                                            Ok(len) => len,
+                                            Err(_) => 0
+                                        };
+                                        Msg::UpdateMaxLength(length)
+                                    })
+                            />
+                        </td>
+                    </tr>
+                </table>
+            },
+            None => html! {
+                <label class="form-checkbox" for="field-editing_max_length">
+                    <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        id="field-editing_max_length"
+                        onclick=link.callback(|_| Msg::ToogleMaxLength)
+                        checked=false />
+                    <i class="form-icon"></i>{"Max Length"}
+                </label>
+            },
+        },
+        None => html! {
+            <label class="form-checkbox" for="field-editing_max_length">
+                <input
+                    type="checkbox"
+                    class="form-checkbox"
+                    id="field-editing_max_length"
+                    onclick=link.callback(|_| Msg::ToogleMaxLength)
+                    checked=false />
+                <i class="form-icon"></i>{"Max Length"}
+            </label>
+        },
+    }
+}
+
 pub fn view_edit_field_container(
     link: &ComponentLink<App>,
     creating_field: &Field,
@@ -401,6 +546,8 @@ pub fn view_edit_field_container(
     editing_enum_values_view: Html,
     field_type_select_view: Html,
 ) -> Html {
+    let min_length_view = view_min_length_editor(link, creating_field);
+    let max_length_view = view_max_length_editor(link, creating_field);
     html! {
         <div>
             <h1>{"Edit field: "}{&creating_field.name}</h1>
@@ -462,6 +609,7 @@ pub fn view_edit_field_container(
 
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
+
                     </div>
                     <div class="col-9 col-sm-12">
                         <label class="form-checkbox" for="field-editing_required">
@@ -473,6 +621,23 @@ pub fn view_edit_field_container(
                                 checked=creating_field.required />
                             <i class="form-icon"></i>{"Required"}
                         </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        {"Validation :"}
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {min_length_view}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {max_length_view}
                     </div>
                 </div>
 

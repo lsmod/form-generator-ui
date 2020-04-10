@@ -15,8 +15,8 @@ pub mod form_model {
     }
     #[derive(Deserialize, Debug, Clone, Default)]
     pub struct Validation {
-        pub min_length: Option<u8>,
-        pub max_length: Option<u8>,
+        pub min_length: Option<usize>,
+        pub max_length: Option<usize>,
         pub enum_values: Option<Vec<EnumValues>>,
     }
 

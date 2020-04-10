@@ -35,7 +35,7 @@ const {= name =}Page: React.FC<> = () => {
         {%- match validator.min_length %}
         {%- when Some with (min) %}
     else if (values.{= field.name =}.length < {=min =}) {
-      errors.lastName = 'Minimum {= min =} caractères';
+      errors.{= field.name =} = 'Minimum {= min =} caractères';
     }
         {%- when None %}
         {%- endmatch %}
@@ -43,14 +43,38 @@ const {= name =}Page: React.FC<> = () => {
         {%- match validator.max_length %}
         {%- when Some with (max) %}
     else if (values.{= field.name =}.length > {= max =}) {
-      errors.lastName = 'Maximum {= max =} caractères';
+      errors.{= field.name =} = 'Maximum {= max =} caractères';
     }
         {%- when None %}
         {%- endmatch %}
 
       {%- when None -%}
       {%- endmatch %}
+      {% else %}
+        {%- match field.validation -%}
+        {%- when Some with (validator) -%}
+          {%- match validator.min_length %}
+          {%- when Some with (min) %}
+    if (values.{= field.name =}) {
+      if (values.{= field.name =}.length < {=min =}) {
+        errors.{= field.name =} = 'Minimum {= min =} caractères';
+      }
+    }
+          {%- when None %}
+          {%- endmatch %}
 
+          {%- match validator.max_length %}
+          {%- when Some with (max) %}
+    if (values.{= field.name =}) {
+      if (values.{= field.name =}.length > {= max =}) {
+        errors.{= field.name =} = 'Maximum {= max =} caractères';
+      }
+    }
+          {%- when None %}
+          {%- endmatch %}
+
+        {%- when None -%}
+        {%- endmatch %}
       {% endif %}
     {%- endfor %}
 
