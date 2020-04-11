@@ -137,8 +137,32 @@ export default validate;
         <Content padder>
           <Form>
             {%- for field in fields %}
-            {# TODO picker textarea input with autocompletion #}
-            {# TODO match on type: password secureTextEntry, radio: picker; list; picker, #}
+            {% match field.data_type %}
+            {% when FieldDataType::Radio %}
+            <View
+              style={[
+                formStyles.pickerContainer,
+                errors.{= field.name =} ? formStyles.errorBorder : null,
+              ]}>
+              <Text style={formStyles.pickerLabelText}>
+                {errors.{= field.name =} || '{= field.label =}'}
+              </Text>
+              <Picker
+                mode="dropdown"
+                placeholder="{= field.placeholder =}"
+                style={formStyles.pickerPicker}
+                selectedValue={values.{= field.name =}}
+                onValueChange={value => setFieldValue('{= field.name =}', value)}>
+                {% for enum_values in field.enum_values %}
+                  <Picker.Item
+                    key={{= field.name =}}
+                    label={{= field.label =}}
+                    value={{= field.name =}}
+                  />
+                {% endfor %}
+              </Picker>
+            </View>
+            {% when _ %}
             <Item floatingLabel error={!!errors['{= field.name =}']}>
               <Label>{errors.{= field.name =} || '{= field.label =}'}</Label>
               <Input
@@ -147,6 +171,10 @@ export default validate;
                 placeholder="{= field.placeholder =}"
               />
             </Item>
+            {% endmatch %}
+            {# TODO picker textarea input with autocompletion #}
+            {# TODO match on type: password secureTextEntry, radio: picker; list; picker, #}
+
             {%- endfor %}
           </Form>
         </Content>

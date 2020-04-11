@@ -8,6 +8,7 @@ use crate::inflector::Inflector;
 /// Field with added informations needed for template generation
 struct TemplateField<'a> {
     pub html_element: &'a str,
+    pub data_type: &'a FieldDataType,
     pub input_type: &'a str,
     pub name: &'a String,
     pub label: &'a String,
@@ -21,6 +22,7 @@ impl<'a> From<&'a Field> for TemplateField<'a> {
         TemplateField {
             html_element: to_html_type(&field.data_type),
             input_type: to_input_type(&field.data_type),
+            data_type: &field.data_type,
             name: &field.name,
             label: &field.label,
             placeholder: &field.placeholder,
