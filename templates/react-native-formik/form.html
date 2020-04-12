@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 import {
+  Stylesheet,
   Content,
   Button,
   Container,
@@ -184,10 +185,6 @@ const {= name =}Page: React.FC<> = () => {
             </Item>
             {%- when _ -%}
             {%- endmatch -%}
-            {# TODO textarea
-            {# editable multiple select input with autocompletion #}
-
-
             {%- endfor %}
           </Form>
         </Content>
