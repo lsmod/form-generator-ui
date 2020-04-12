@@ -4,12 +4,17 @@ use crate::react_native_formik::helpers::to_input_type;
 use crate::react_native_formik::helpers::to_html_type;
 use crate::inflector::Inflector;
 
-
+#[derive(Debug, Clone, PartialEq)]
+pub enum FieldType {
+    Picker,
+    Input,
+    Textarea,
+}
 /// Field with added informations needed for template generation
 struct TemplateField<'a> {
     pub html_element: &'a str,
+    pub input_type: &'a FieldType,
     pub data_type: &'a FieldDataType,
-    pub input_type: &'a str,
     pub name: &'a String,
     pub label: &'a String,
     pub placeholder: &'a String,

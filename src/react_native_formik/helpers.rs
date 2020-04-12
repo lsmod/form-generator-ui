@@ -1,4 +1,6 @@
 use crate::form_model::form_model::FieldDataType;
+use crate::react_native_formik::form_template::FieldType::*;
+use crate::react_native_formik::form_template::FieldType;
 
 pub fn to_html_type(type_definition: &FieldDataType) -> &str {
     match type_definition {
@@ -20,21 +22,21 @@ pub fn to_html_type(type_definition: &FieldDataType) -> &str {
 }
 
 /// take a type of data (model type) and return matching type input
-pub fn to_input_type(type_definition: &FieldDataType) -> &str {
+pub fn to_input_type(type_definition: &FieldDataType) -> &FieldType {
     match type_definition {
-        FieldDataType::Text => "text",
-        FieldDataType::Email => "text",
-        FieldDataType::Url => "text",
-        FieldDataType::Password => "text",
-        FieldDataType::Phone => "text",
-        FieldDataType::LongText => "text",
-        FieldDataType::Date => "text",
-        FieldDataType::Number => "text",
-        FieldDataType::Radio => "text",
-        FieldDataType::Checkbox => "text",
-        FieldDataType::SelectList => "text",
-        FieldDataType::EditableSelectList => "text",
-        FieldDataType::MultiSelectList => "text",
-        FieldDataType::EditableMultiSelectList => "text",
+        FieldDataType::Text => &Input,
+        FieldDataType::Email => &Input,
+        FieldDataType::Url => &Input,
+        FieldDataType::Password => &Input,
+        FieldDataType::Phone => &Input,
+        FieldDataType::LongText => &Textarea,
+        FieldDataType::Date => &Input,
+        FieldDataType::Number => &Input,
+        FieldDataType::Radio => &Picker,
+        FieldDataType::Checkbox => &Picker,
+        FieldDataType::SelectList => &Picker,
+        FieldDataType::EditableSelectList => &Input,
+        FieldDataType::MultiSelectList => &Input,
+        FieldDataType::EditableMultiSelectList => &Input,
     }
 }

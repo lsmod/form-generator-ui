@@ -25,7 +25,8 @@ const {= name =}Page: React.FC<> = () => {
   const validate = (values: any) => {
     const errors: any = {};
     const minLength = 6;
-    {% for field in fields %}
+
+    {%- for field in fields -%}
       {%- if field.required %}
     if (!values.{= field.name =}) {
       errors.{= field.name =} = '{= field.label =} est requis';
@@ -75,15 +76,11 @@ const {= name =}Page: React.FC<> = () => {
 
         {%- when None -%}
         {%- endmatch %}
-      {% endif %}
+      {%- endif %}
     {%- endfor %}
 
     return errors;
   };
-
-export default validate;
-
-  {# TODO validation #}
 
   return (
     <Formik
@@ -136,9 +133,9 @@ export default validate;
           </Header>
         <Content padder>
           <Form>
-            {%- for field in fields %}
-            {% match field.data_type %}
-            {% when FieldDataType::Radio %}
+            {%- for field in fields -%}
+            {%- match field.input_type -%}
+            {%- when FieldType::Picker -%}
             <View
               style={[
                 formStyles.pickerContainer,
@@ -153,27 +150,40 @@ export default validate;
                 style={formStyles.pickerPicker}
                 selectedValue={values.{= field.name =}}
                 onValueChange={value => setFieldValue('{= field.name =}', value)}>
-                {% for enum_values in field.enum_values %}
-                  <Picker.Item
-                    key={{= field.name =}}
-                    label={{= field.label =}}
-                    value={{= field.name =}}
-                  />
-                {% endfor %}
+                {%- match field.validation -%}
+                {%- when Some with (validation) -%}
+                  {%- match validation.enum_values -%}
+                  {%- when Some with (enum_values) -%}
+                    {%- for enum_value in enum_values %}
+                <Picker.Item
+                  key="{= enum_value.value =}"
+                  label="{= enum_value.label =}"
+                  value="{= enum_value.value =}"
+                />
+                    {%- endfor %}
+                  {%- when None -%}
+                  {%- endmatch -%}
+                {%- when None -%}
+                {%- endmatch -%}
               </Picker>
             </View>
-            {% when _ %}
+            {%- when FieldType::Input -%}
             <Item floatingLabel error={!!errors['{= field.name =}']}>
               <Label>{errors.{= field.name =} || '{= field.label =}'}</Label>
               <Input
                 value={values.{= field.name =}}
                 onChangeText={handleChange('{= field.name =}')}
                 placeholder="{= field.placeholder =}"
+                {%- match field.data_type -%}
+                {% when FieldDataType::Password %}secureTextEntry={true}
+                {%- when _ -%}{%- endmatch -%}
               />
             </Item>
-            {% endmatch %}
-            {# TODO picker textarea input with autocompletion #}
-            {# TODO match on type: password secureTextEntry, radio: picker; list; picker, #}
+            {% when _ %}
+            {%- endmatch -%}
+            {# TODO textarea
+            {# editable multiple select input with autocompletion #}
+
 
             {%- endfor %}
           </Form>
