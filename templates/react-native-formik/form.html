@@ -135,8 +135,8 @@ const {= name =}Page: React.FC<> = () => {
           <Form>
             {%- for field in fields -%}
             {%- match field.input_type -%}
-            {%- when FieldType::Picker -%}
-            <View
+            {%- when FieldType::Picker %}
+            <Item picker
               style={[
                 formStyles.pickerContainer,
                 errors.{= field.name =} ? formStyles.errorBorder : null,
@@ -146,6 +146,9 @@ const {= name =}Page: React.FC<> = () => {
               </Text>
               <Picker
                 mode="dropdown"
+                iosHeader="{= field.label =}"
+                headerBackButtonText="Fermer"
+                iosIcon={<Icon name="arrow-down" />}
                 placeholder="{= field.placeholder =}"
                 style={formStyles.pickerPicker}
                 selectedValue={values.{= field.name =}}
@@ -164,10 +167,10 @@ const {= name =}Page: React.FC<> = () => {
                   {%- when None -%}
                   {%- endmatch -%}
                 {%- when None -%}
-                {%- endmatch -%}
+                {%- endmatch %}
               </Picker>
-            </View>
-            {%- when FieldType::Input -%}
+            </Item>
+            {%- when FieldType::Input %}
             <Item floatingLabel error={!!errors['{= field.name =}']}>
               <Label>{errors.{= field.name =} || '{= field.label =}'}</Label>
               <Input
@@ -179,7 +182,7 @@ const {= name =}Page: React.FC<> = () => {
                 {%- when _ -%}{%- endmatch -%}
               />
             </Item>
-            {% when _ %}
+            {%- when _ -%}
             {%- endmatch -%}
             {# TODO textarea
             {# editable multiple select input with autocompletion #}
