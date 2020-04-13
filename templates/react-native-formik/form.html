@@ -1,18 +1,27 @@
 import * as React from 'react';
 import { Formik } from 'formik';
+import { StyleSheet, Keyboard } from 'react-native';
 import {
-  Stylesheet,
   Content,
   Button,
   Container,
   Form,
   Item,
+  Header,
+  Left,
+  Title,
+  Right,
+  Body,
+  Label,
+  Spinner,
+  Text,
+  Icon,
   {%- for import in components_imports %}
   {= import =},
   {%- endfor %}
 } from 'native-base';
 
-const {= name =}Page: React.FC<> = () => {
+const {= name =}Page: React.FC = () => {
   // TODO: const store = useMyStore();
   const isSending = store.state.isSending;
   const defaultValue = {
@@ -28,7 +37,6 @@ const {= name =}Page: React.FC<> = () => {
 
   const validate = (values: any) => {
     const errors: any = {};
-    const minLength = 6;
 
     {%- for field in fields -%}
       {%- if field.required %}
@@ -221,3 +229,5 @@ const formStyles = StyleSheet.create({
   pickerPicker: { width: undefined },
   descriptionText: { marginTop: 20 },
 });
+
+export default {= name =}Page;
