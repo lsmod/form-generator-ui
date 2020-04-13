@@ -41,6 +41,7 @@ pub struct EditingEnumValue {
 #[derive(Default, Debug)]
 pub struct GeneratedFile {
     file_name: String,
+    language: &'static str,
     content: String,
 }
 
@@ -71,6 +72,7 @@ pub struct State {
     editing_mode: EditorMode,
     model: Model,
     generated_files: Vec<GeneratedFile>,
+    selected_file: usize,
 }
 
 impl Default for State {
@@ -80,6 +82,7 @@ impl Default for State {
             editing_enum_value: None,
             creating_enum_value: None,
             generated_files: vec![],
+            selected_file: 0,
             model: Model {
                 name: "profile".to_string(),
                 title: Some("Édition du profil".to_string()),
@@ -190,13 +193,8 @@ pub enum Msg {
     MoveEnumValueDown(usize),
 
     NewGenerate,
+    SelectFile(usize),
     /*
-
-
-    RemoveField,
-    DeleteField,
-
-
 
     NewListValue,
     CreateFieldValue,
@@ -373,6 +371,10 @@ impl Component for App {
                 }
                 true
             }
+            Msg::SelectFile(index) => {
+                self.state.selected_file = index;
+                true
+            },
             Msg::EditField(index) => {
                 self.state.editing_mode = EditorMode::EditingField(EditingField {
                     field: self.state.model.fields[index].clone(),
@@ -719,6 +721,7 @@ impl Component for App {
                 self.state.generated_files = vec![];
                 self.state.generated_files.push(GeneratedFile {
                     file_name: "form.html".to_string(),
+                    language: "JSX",
                     content: form_template.render().unwrap(),
                 });
                 self.console.log(
@@ -740,7 +743,7 @@ impl Component for App {
             EditorMode::EditingField(_) => self.view_editing_field(),
             EditorMode::Listing => view_edit_model_view(&self.link, &self.state.model),
         };
-        main_view(&self.link, &self.state.model, top_view)
+        main_view(&self.link, &self.state.model, &self.state.generated_files, self.state.selected_file, top_view)
     }
 }
 
