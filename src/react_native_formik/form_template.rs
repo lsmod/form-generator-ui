@@ -1,3 +1,4 @@
+use crate::react_native_formik::helpers::list_component_imports;
 use askama::Template;
 use crate::form_model::form_model::*;
 use crate::react_native_formik::helpers::to_input_type;
@@ -44,7 +45,8 @@ pub struct FormTemplate<'a> {
     submit_label: &'a String,
     title: &'a Option<String>,
     subtitle: &'a Option<String>,
-    fields: Vec<TemplateField<'a>>
+    fields: Vec<TemplateField<'a>>,
+    components_imports: Vec<&'a str>,
 }
 
 impl<'a> From<& 'a Model> for FormTemplate<'a> {
@@ -58,7 +60,8 @@ impl<'a> From<& 'a Model> for FormTemplate<'a> {
             submit_label: &model.submit_label,
             title: &model.title,
             subtitle: &model.subtitle,
-            fields: new_fields
+            fields: new_fields,
+            components_imports: list_component_imports(&model.fields)
         }
     }
 }

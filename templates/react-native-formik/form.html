@@ -6,7 +6,10 @@ import {
   Button,
   Container,
   Form,
-  Item, {# TODO adds import form field #}
+  Item,
+  {%- for import in components_imports %}
+  {= import =},
+  {%- endfor %}
 } from 'native-base';
 
 const {= name =}Page: React.FC<> = () => {
