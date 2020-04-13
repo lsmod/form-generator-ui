@@ -192,8 +192,8 @@ fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Ht
             <td>{&field.placeholder}</td>
             <td>{&field.required}</td>
             <td>
-                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveFieldDown(index))><i class="icon icon-arrow-down"></i></button>
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveFieldUp(index))><i class="icon icon-arrow-up"></i></button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveFieldDown(index))><i class="icon icon-arrow-down"></i></button>
             </td>
             <td>
                 <button class="btn" onclick=link.callback(move |_| Msg::DeleteField(index))><i class="icon icon-cross"></i> {" Delete"}</button>
@@ -236,8 +236,8 @@ fn view_enum_values_item(link: &ComponentLink<App>, index: usize, enum_value: &E
             <td>{&enum_value.value}</td>
             <td>{&enum_value.label}</td>
             <td>
-                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueDown(index))><i class="icon icon-arrow-down"></i></button>
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueUp(index))><i class="icon icon-arrow-up"></i></button>
+                <button class="btn" type="button" onclick=link.callback(move |_| Msg::MoveEnumValueDown(index))><i class="icon icon-arrow-down"></i></button>
             </td>
             <td>
                 <button class="btn" type="button" onclick=link.callback(move |_| Msg::DeleteEnumValue(index))><i class="icon icon-cross"></i> {" Delete"}</button>
