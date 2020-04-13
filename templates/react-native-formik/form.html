@@ -183,6 +183,25 @@ const {= name =}Page: React.FC<> = () => {
                 {%- when _ -%}{%- endmatch -%}
               />
             </Item>
+            {%- when FieldType::Textarea %}
+            <Text style={formStyles.textareaText}>
+              {errors.{= field.name =} || '{= field.label =}'}
+            </Text>
+            <Textarea
+              rowSpan={4}
+              bordered
+              style={[
+                errors.{= field.name =}
+                  ? { borderColor: 'red', borderWidth: 0.6 }
+                  : null,
+              ]}
+              multiline={true}
+              numberOfLines={3}
+              underline={false}
+              value={values.{= field.name =}}
+              onChangeText={handleChange('{= field.name =}')}
+              placeholder="{= field.placeholder =}"
+            />
             {%- when _ -%}
             {%- endmatch -%}
             {%- endfor %}
