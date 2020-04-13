@@ -142,7 +142,6 @@ const {= name =}Page: React.FC<> = () => {
             {%- when FieldType::Picker %}
             <Item picker
               style={[
-                formStyles.pickerContainer,
                 errors.{= field.name =} ? formStyles.errorBorder : null,
               ]}>
               <Text style={formStyles.pickerLabelText}>
@@ -215,3 +214,10 @@ const {= name =}Page: React.FC<> = () => {
     </Formik>
   );
 }
+
+const formStyles = StyleSheet.create({
+  errorBorder: { borderBottomColor: 'red', borderBottomWidth: 0.6 },
+  pickerLabelText: { flex: 1 },
+  pickerPicker: { width: undefined },
+  descriptionText: { marginTop: 20 },
+});
