@@ -286,7 +286,7 @@ pub fn view_editing_enum_value(
 // TODO clone select component and add class, id param as a prop
 pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataType) -> Html {
     html! {
-        <div class="form-group">
+        <div class="form-group" id="field-editing_type_form-group">
             <Select<FieldDataType>
                 selected=Some(field_type)
                 options=FieldDataType::iter().collect::<Vec<_>>()
