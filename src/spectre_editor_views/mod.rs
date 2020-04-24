@@ -197,7 +197,7 @@ fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Ht
             </td>
             <td>
                 <button class="btn" onclick=link.callback(move |_| Msg::DeleteField(index))><i class="icon icon-cross"></i> {" Delete"}</button>
-                <button class="btn btn-primary" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
+                <button id={format!("edit-btn-{}", &field.name)} class="btn btn-primary" onclick=link.callback(move |_| Msg::EditField(index))><i class="icon icon-edit"></i> {" Edit"}</button>
             </td>
         </tr>
     }
