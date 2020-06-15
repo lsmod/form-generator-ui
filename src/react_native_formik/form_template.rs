@@ -39,7 +39,7 @@ impl<'a> From<&'a Field> for TemplateField<'a> {
 }
 
 #[derive(Template)]
-#[template (path = "react-native-formik/form.html", escape = "none")]
+#[template (path = "react-native-formik/form.html.jinja2", escape = "none")]
 pub struct FormTemplate<'a> {
     name: String,
     submit_label: &'a String,
