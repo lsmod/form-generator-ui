@@ -1,10 +1,13 @@
-use yew::{html, Component, Callback, ComponentLink,Properties, Html, ShouldRender};
+use yew::{html, Component, Callback, ComponentLink,Properties, Html, ShouldRender, Children, html::Renderable};
 
 // TODO adds icons props add primary, secondary (outline)
 
 #[derive(Properties, Clone)]
 pub struct Props {
+    pub children: Children,
     pub text: String,
+    pub primary: bool,
+    pub id: Option<String>,
     // TODO make it optionnal by having an option
     // @see https://dev.to/deciduously/lets-build-a-rust-frontend-with-yew---part-2-1ech
     // @see https://github.com/deciduously/hunt-the-wumpus/blob/66938953772f75051658a222d2643ed881db694c/part2/src/components/controls.rs
@@ -47,8 +50,18 @@ impl Component for Button
     }
 
     fn view(&self) -> Html {
-        html! {
-            <button onclick=self.link.callback(|_|Msg::Click)>{self.props.text.as_str()}</button>
+        let btn_class = if self.props.primary { "btn btn-primary" } else { "btn"};
+        match &self.props.id {
+            Some(id) => html! {
+                <button id=id class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
+                    {self.props.children.render()}
+                </button>
+            },
+            None => html! {
+                <button class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
+                    {self.props.children.render()}
+                </button>
+            }
         }
     }
 }
