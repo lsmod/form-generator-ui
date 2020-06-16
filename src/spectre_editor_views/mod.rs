@@ -12,12 +12,15 @@ use crate::App;
 use crate::EditingEnumValue;
 use crate::Msg;
 use crate::GeneratedFile;
+mod button;
+use button::Button;
 
 // TODO: add cancel save (when creating editing enum values)
 pub fn main_view(link: &ComponentLink<App>, model: &Model, generated_files: &Vec<GeneratedFile>, selected_file: usize, top_view: Html) -> Html {
     let generated_files_view = view_generated_files(link, generated_files, selected_file);
     html! {
         <div style="margin-left: 5vw; margin-right: 5vw; margin-top: 20px;">
+            <Button onclick=link.callback(|_|Msg::CancelNewField) text="cancel"/>
             { top_view }
             <div class="model-field-container">
                 <h2>{"Fields"}</h2>

@@ -151,6 +151,7 @@ impl Default for State {
 // - camelCase, snake_case
 // - move into a separated module
 // - divide into sub Component (edit field, new field, header)
+#[derive(Clone)]
 pub enum Msg {
     UpdateName(String),
     UpdateTitle(String),
