@@ -12,8 +12,8 @@ use crate::App;
 use crate::EditingEnumValue;
 use crate::Msg;
 use crate::GeneratedFile;
-mod button;
-use button::Button;
+mod components;
+use self::components::{button::Button};
 
 // TODO: add cancel save (when creating editing enum values)
 pub fn main_view(link: &ComponentLink<App>, model: &Model, generated_files: &Vec<GeneratedFile>, selected_file: usize, top_view: Html) -> Html {
