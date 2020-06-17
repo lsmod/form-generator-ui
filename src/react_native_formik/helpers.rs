@@ -1,7 +1,7 @@
 use crate::form_model::form_model::Field;
 use crate::form_model::form_model::FieldDataType;
-use crate::react_native_formik::form_template::FieldType::*;
 use crate::react_native_formik::form_template::FieldType;
+use crate::react_native_formik::form_template::FieldType::*;
 
 pub fn to_html_type(type_definition: &FieldDataType) -> &str {
     match type_definition {

@@ -10,13 +10,11 @@ use yew::{html, ComponentLink, Html};
 
 use crate::App;
 use crate::EditingEnumValue;
-use crate::Msg;
 use crate::GeneratedFile;
+use crate::Msg;
 mod components;
 use self::components::{
-    button::Button,
-    field_list_item::FieldListItem,
-    field_list_container::FieldListContainer
+    button::Button, field_list_container::FieldListContainer, field_list_item::FieldListItem,
 };
 
 // TODO refactor into components:
@@ -32,7 +30,13 @@ use self::components::{
 // input, h1, h2, icons
 
 // TODO: add cancel save (when creating editing enum values)
-pub fn main_view(link: &ComponentLink<App>, model: &Model, generated_files: &Vec<GeneratedFile>, selected_file: usize, top_view: Html) -> Html {
+pub fn main_view(
+    link: &ComponentLink<App>,
+    model: &Model,
+    generated_files: &Vec<GeneratedFile>,
+    selected_file: usize,
+    top_view: Html,
+) -> Html {
     let generated_files_view = view_generated_files(link, generated_files, selected_file);
     html! {
         <div style="margin-left: 5vw; margin-right: 5vw; margin-top: 20px;">
@@ -57,9 +61,13 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, generated_files: &Vec
     }
 }
 
-pub fn view_generated_files(link: &ComponentLink<App>, generated_files: &Vec<GeneratedFile>, selected_file: usize) -> Html {
+pub fn view_generated_files(
+    link: &ComponentLink<App>,
+    generated_files: &Vec<GeneratedFile>,
+    selected_file: usize,
+) -> Html {
     if generated_files.len() > 0 {
-        html!{
+        html! {
             <div style="margin-top: 20px;">
                 <h2 style="text-align: center;">
                     <i>{"Source Files:"}</i>
@@ -79,9 +87,8 @@ pub fn view_generated_files(link: &ComponentLink<App>, generated_files: &Vec<Gen
                 </pre>
             </div>
         }
-    }
-    else {
-        html!{}
+    } else {
+        html! {}
     }
 }
 

@@ -1,5 +1,6 @@
-use yew::{html, Component, ComponentLink, Properties, Html, ShouldRender, Children, html::Renderable};
-
+use yew::{
+    html, html::Renderable, Children, Component, ComponentLink, Html, Properties, ShouldRender,
+};
 
 #[derive(Properties, Clone)]
 pub struct Props {
@@ -10,16 +11,12 @@ pub struct FieldListContainer {
     props: Props,
 }
 
-
-impl Component for FieldListContainer
-{
+impl Component for FieldListContainer {
     type Message = ();
     type Properties = Props;
 
     fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        FieldListContainer {
-            props,
-        }
+        FieldListContainer { props }
     }
 
     fn update(&mut self, _: Self::Message) -> ShouldRender {
@@ -32,7 +29,7 @@ impl Component for FieldListContainer
     }
 
     fn view(&self) -> Html {
-        html!{
+        html! {
             <div class="model-field-container">
                 <h2>{"Fields"}</h2>
                 <table class="table table-striped table-hover">

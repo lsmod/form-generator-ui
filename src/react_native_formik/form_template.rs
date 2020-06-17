@@ -1,9 +1,9 @@
-use crate::react_native_formik::helpers::list_component_imports;
-use askama::Template;
 use crate::form_model::form_model::*;
-use crate::react_native_formik::helpers::to_input_type;
-use crate::react_native_formik::helpers::to_html_type;
 use crate::inflector::Inflector;
+use crate::react_native_formik::helpers::list_component_imports;
+use crate::react_native_formik::helpers::to_html_type;
+use crate::react_native_formik::helpers::to_input_type;
+use askama::Template;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FieldType {
@@ -39,7 +39,7 @@ impl<'a> From<&'a Field> for TemplateField<'a> {
 }
 
 #[derive(Template)]
-#[template (path = "react-native-formik/form.html.jinja2", escape = "none")]
+#[template(path = "react-native-formik/form.html.jinja2", escape = "none")]
 pub struct FormTemplate<'a> {
     name: String,
     submit_label: &'a String,
@@ -49,19 +49,20 @@ pub struct FormTemplate<'a> {
     components_imports: Vec<&'a str>,
 }
 
-impl<'a> From<& 'a Model> for FormTemplate<'a> {
+impl<'a> From<&'a Model> for FormTemplate<'a> {
     fn from(model: &'a Model) -> FormTemplate<'a> {
-        let new_fields = model.fields
-                                .iter()
-                                .map(|field| TemplateField::from(field))
-                                .collect();
+        let new_fields = model
+            .fields
+            .iter()
+            .map(|field| TemplateField::from(field))
+            .collect();
         FormTemplate {
             name: model.name.to_class_case(),
             submit_label: &model.submit_label,
             title: &model.title,
             subtitle: &model.subtitle,
             fields: new_fields,
-            components_imports: list_component_imports(&model.fields)
+            components_imports: list_component_imports(&model.fields),
         }
     }
 }

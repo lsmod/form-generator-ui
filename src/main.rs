@@ -244,138 +244,114 @@ impl Component for App {
                 self.state.model.submit_label = label;
                 true
             }
-            Msg::ToogleMinLength  => {
+            Msg::ToogleMinLength => {
                 match &mut self.state.editing_mode {
-                    EditorMode::CreatingField(field) => {
-                        match &mut field.validation {
-                            Some(validation) => {
-                                match validation.min_length {
-                                    Some(_) => validation.min_length = None,
-                                    None => validation.min_length = Some(8)
-                                }
-                            },
-                            None => field.validation = Some(Validation {
+                    EditorMode::CreatingField(field) => match &mut field.validation {
+                        Some(validation) => match validation.min_length {
+                            Some(_) => validation.min_length = None,
+                            None => validation.min_length = Some(8),
+                        },
+                        None => {
+                            field.validation = Some(Validation {
                                 min_length: Some(8),
                                 max_length: None,
                                 enum_values: None,
                             })
                         }
                     },
-                    EditorMode::EditingField(field)=> {
-                        match &mut field.field.validation {
-                            Some(validation) => {
-                                match validation.min_length {
-                                    Some(_) => validation.min_length = None,
-                                    None => validation.min_length = Some(8)
-                                }
-                            },
-                            None => field.field.validation = Some(Validation {
+                    EditorMode::EditingField(field) => match &mut field.field.validation {
+                        Some(validation) => match validation.min_length {
+                            Some(_) => validation.min_length = None,
+                            None => validation.min_length = Some(8),
+                        },
+                        None => {
+                            field.field.validation = Some(Validation {
                                 min_length: Some(8),
                                 max_length: None,
                                 enum_values: None,
                             })
                         }
                     },
-                    _ => ()
+                    _ => (),
                 }
                 true
             }
             Msg::ToogleMaxLength => {
                 match &mut self.state.editing_mode {
-                    EditorMode::CreatingField(field) => {
-                        match &mut field.validation {
-                            Some(validation) => {
-                                match validation.max_length {
-                                    Some(_) => validation.max_length = None,
-                                    None => validation.max_length = Some(30)
-                                }
-                            },
-                            None => field.validation = Some(Validation {
+                    EditorMode::CreatingField(field) => match &mut field.validation {
+                        Some(validation) => match validation.max_length {
+                            Some(_) => validation.max_length = None,
+                            None => validation.max_length = Some(30),
+                        },
+                        None => {
+                            field.validation = Some(Validation {
                                 min_length: None,
                                 max_length: Some(30),
                                 enum_values: None,
                             })
                         }
                     },
-                    EditorMode::EditingField(field)=> {
-                        match &mut field.field.validation {
-                            Some(validation) => {
-                                match validation.max_length {
-                                    Some(_) => validation.max_length = None,
-                                    None => validation.max_length = Some(30)
-                                }
-                            },
-                            None => field.field.validation = Some(Validation {
+                    EditorMode::EditingField(field) => match &mut field.field.validation {
+                        Some(validation) => match validation.max_length {
+                            Some(_) => validation.max_length = None,
+                            None => validation.max_length = Some(30),
+                        },
+                        None => {
+                            field.field.validation = Some(Validation {
                                 min_length: None,
                                 max_length: Some(30),
                                 enum_values: None,
                             })
                         }
                     },
-                    _ => ()
+                    _ => (),
                 }
                 true
             }
             Msg::UpdateMinLength(length) => {
                 match &mut self.state.editing_mode {
-                    EditorMode::CreatingField(field) => {
-                        match &mut field.validation {
-                            Some(validation) => {
-                                match validation.min_length {
-                                    Some(_) => validation.min_length = Some(length),
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                    EditorMode::CreatingField(field) => match &mut field.validation {
+                        Some(validation) => match validation.min_length {
+                            Some(_) => validation.min_length = Some(length),
+                            None => (),
+                        },
+                        None => (),
                     },
-                    EditorMode::EditingField(field)=> {
-                        match &mut field.field.validation {
-                            Some(validation) => {
-                                match validation.min_length {
-                                    Some(_) => validation.min_length = Some(length),
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                    EditorMode::EditingField(field) => match &mut field.field.validation {
+                        Some(validation) => match validation.min_length {
+                            Some(_) => validation.min_length = Some(length),
+                            None => (),
+                        },
+                        None => (),
                     },
-                    _ => ()
+                    _ => (),
                 }
                 true
             }
             Msg::UpdateMaxLength(length) => {
                 match &mut self.state.editing_mode {
-                    EditorMode::CreatingField(field) => {
-                        match &mut field.validation {
-                            Some(validation) => {
-                                match validation.max_length {
-                                    Some(_) => validation.max_length = Some(length),
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                    EditorMode::CreatingField(field) => match &mut field.validation {
+                        Some(validation) => match validation.max_length {
+                            Some(_) => validation.max_length = Some(length),
+                            None => (),
+                        },
+                        None => (),
                     },
-                    EditorMode::EditingField(field)=> {
-                        match &mut field.field.validation {
-                            Some(validation) => {
-                                match validation.max_length {
-                                    Some(_) => validation.max_length = Some(length),
-                                    None => ()
-                                }
-                            },
-                            None => ()
-                        }
+                    EditorMode::EditingField(field) => match &mut field.field.validation {
+                        Some(validation) => match validation.max_length {
+                            Some(_) => validation.max_length = Some(length),
+                            None => (),
+                        },
+                        None => (),
                     },
-                    _ => ()
+                    _ => (),
                 }
                 true
             }
             Msg::SelectFile(index) => {
                 self.state.selected_file = index;
                 true
-            },
+            }
             Msg::EditField(index) => {
                 self.state.editing_mode = EditorMode::EditingField(EditingField {
                     field: self.state.model.fields[index].clone(),
@@ -744,7 +720,13 @@ impl Component for App {
             EditorMode::EditingField(_) => self.view_editing_field(),
             EditorMode::Listing => view_edit_model_view(&self.link, &self.state.model),
         };
-        main_view(&self.link, &self.state.model, &self.state.generated_files, self.state.selected_file, top_view)
+        main_view(
+            &self.link,
+            &self.state.model,
+            &self.state.generated_files,
+            self.state.selected_file,
+            top_view,
+        )
     }
 }
 

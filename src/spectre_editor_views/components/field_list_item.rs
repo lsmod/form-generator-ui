@@ -1,7 +1,6 @@
-use yew::{html, Component, Callback, ComponentLink,Properties, Html, ShouldRender, Children};
-use crate::Field;
 use crate::spectre_editor_views::components::button::Button;
-
+use crate::Field;
+use yew::{html, Callback, Children, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]
 pub struct Props {
@@ -30,17 +29,12 @@ pub struct FieldListItem {
     link: ComponentLink<Self>,
 }
 
-
-impl Component for FieldListItem
-{
+impl Component for FieldListItem {
     type Message = Msg;
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        FieldListItem {
-            props,
-            link,
-        }
+        FieldListItem { props, link }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {

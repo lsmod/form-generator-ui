@@ -1,4 +1,7 @@
-use yew::{html, Component, Callback, ComponentLink,Properties, Html, ShouldRender, Children, html::Renderable};
+use yew::{
+    html, html::Renderable, Callback, Children, Component, ComponentLink, Html, Properties,
+    ShouldRender,
+};
 
 // TODO adds icons props add primary, secondary (outline)
 
@@ -16,7 +19,7 @@ pub struct Props {
 }
 
 pub enum Msg {
-    Click
+    Click,
 }
 
 pub struct Button {
@@ -24,22 +27,17 @@ pub struct Button {
     link: ComponentLink<Self>,
 }
 
-
-impl Component for Button
-{
+impl Component for Button {
     type Message = Msg;
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Button {
-            props,
-            link,
-        }
+        Button { props, link }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Click => self.props.onclick.emit(())
+            Msg::Click => self.props.onclick.emit(()),
         }
         true
     }
@@ -50,7 +48,11 @@ impl Component for Button
     }
 
     fn view(&self) -> Html {
-        let btn_class = if self.props.primary { "btn btn-primary" } else { "btn"};
+        let btn_class = if self.props.primary {
+            "btn btn-primary"
+        } else {
+            "btn"
+        };
         match &self.props.id {
             Some(id) => html! {
                 <button id=id class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
@@ -61,7 +63,7 @@ impl Component for Button
                 <button class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
                     {self.props.children.render()}
                 </button>
-            }
+            },
         }
     }
 }
