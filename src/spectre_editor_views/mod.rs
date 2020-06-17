@@ -13,10 +13,13 @@ use crate::EditingEnumValue;
 use crate::Msg;
 use crate::GeneratedFile;
 mod components;
-use self::components::{button::Button};
+use self::components::{
+    button::Button,
+    field_list_item::FieldListItem,
+    field_list_container::FieldListContainer
+};
 
 // TODO refactor into components:
-// FieldList
 // ModelForm
 // NewFieldForm
 // EditFieldForm
@@ -33,31 +36,22 @@ pub fn main_view(link: &ComponentLink<App>, model: &Model, generated_files: &Vec
     let generated_files_view = view_generated_files(link, generated_files, selected_file);
     html! {
         <div style="margin-left: 5vw; margin-right: 5vw; margin-top: 20px;">
-
             { top_view }
-            <div class="model-field-container">
-                <h2>{"Fields"}</h2>
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>{"Name"}</th>
-                      <th>{"Type"}</th>
-                      <th>{"Label"}</th>
-                      <th>{"Placeholder"}</th>
-                      <th>{"Required"}</th>
-                      <th>{"Order"}</th>
-                      <th>{"Action"}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  { for model.fields
-                      .iter()
-                      .enumerate()
-                      .map(|(index, field)| view_field_item(link, index, field))
-                  }
-                  </tbody>
-                </table>
-            </div>
+            <FieldListContainer>
+                { for model.fields
+                    .iter()
+                    .enumerate()
+                    .map(|(index, field)| html!{
+                        <FieldListItem
+                          field=field
+                          down_onclick=link.callback(move |_| Msg::MoveFieldDown(index))
+                          up_onclick=link.callback(move |_| Msg::MoveFieldUp(index))
+                          delete_onclick=link.callback(move |_| Msg::DeleteField(index))
+                          edit_onclick=link.callback(move |_| Msg::EditField(index))
+                          />
+                    })
+                }
+            </FieldListContainer>
             {generated_files_view}
         </div>
     }
@@ -202,34 +196,6 @@ pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
                 </div>
             </div>
         </div>
-    }
-}
-
-fn view_field_item(link: &ComponentLink<App>, index: usize, field: &Field) -> Html {
-    html! {
-        <tr>
-            <td>{&field.name}</td>
-            <td>{&field.data_type}</td>
-            <td>{&field.label}</td>
-            <td>{&field.placeholder}</td>
-            <td>{&field.required}</td>
-            <td>
-                <Button onclick=link.callback(move |_| Msg::MoveFieldUp(index))>
-                    <i class="icon icon-arrow-up"></i>
-                </Button>
-                <Button onclick=link.callback(move |_| Msg::MoveFieldDown(index))>
-                    <i class="icon icon-arrow-down"></i>
-                </Button>
-            </td>
-            <td>
-                <Button onclick=link.callback(move |_| Msg::DeleteField(index))>
-                    <i class="icon icon-cross"></i> {" Delete"}
-                </Button>
-                <Button id={format!("edit-btn-{}", &field.name)} onclick=link.callback(move |_| Msg::EditField(index)) primary=true>
-                    <i class="icon icon-edit"></i> {" Edit"}
-                </Button>
-            </td>
-        </tr>
     }
 }
 
