@@ -1,8 +1,5 @@
 use crate::GeneratedFile;
-use yew::{
-    html, Component, ComponentLink, Html, Properties,
-    ShouldRender,
-};
+use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]
 pub struct Props {

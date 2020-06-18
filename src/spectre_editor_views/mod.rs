@@ -15,7 +15,7 @@ use crate::Msg;
 mod components;
 use self::components::{
     button::Button, field_list_container::FieldListContainer, field_list_item::FieldListItem,
-    generated_files_pannel::GeneratedFilesPannel,
+    generated_files_pannel::GeneratedFilesPannel, model_form::ModelForm,
 };
 
 // TODO refactor into components:
@@ -25,7 +25,6 @@ use self::components::{
 // NewEnumForm
 // EditEnumForm
 // EnumList
-// GeneratedFileView
 
 // base component:
 // input, h1, h2, icons
@@ -62,116 +61,33 @@ pub fn main_view(
 }
 
 pub fn view_edit_model_view(link: &ComponentLink<App>, model: &Model) -> Html {
-    let model_subtitle: String = if let Some(model_subtitle) = &model.subtitle {
-        model_subtitle.clone()
-    } else {
-        "".to_string()
-    };
-    let model_title: String = if let Some(model_title) = &model.title {
-        model_title.clone()
-    } else {
-        "".to_string()
-    };
-
     html! {
-        <div>
-            <h1>{"Model: "}{&model.name}</h1>
-            <div>
-                <div class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-3 col-sm-12">
-                            <label class="form-label" for="input_model-name">{"Name: "}</label>
+        <ModelForm
+            model=model
+            update_title=link.callback(move |value| Msg::UpdateTitle(value))
+            update_subtitle=link.callback(move |value| Msg::UpdateSubtitle(value))
+            update_submit_label=link.callback(move |value| Msg::UpdateSubmitLabel(value))
+            update_name=link.callback(move |value| Msg::UpdateName(value))>
+            <div class="form-group">
+                <div class="col-3 col-sm-12"></div>
+                <div class="col-9 col-sm-12">
+                    <div class="columns">
+                        <div class="column col-3 col-mr-auto">
+                            <Button onclick=link.callback(|_| Msg::NewField) primary=true>
+                                <i class="icon icon-plus"></i>
+                                {" New field "}
+                            </Button>
                         </div>
-                        <div class="col-9 col-sm-12">
-                            <input
-                                type="text"
-                                required=true
-                                class="form-input"
-                                id="input_model-name"
-                                placeholder="Name"
-                                value={&model.name}
-                                oninput=link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateName(input.value)
-                                }) />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-3 col-sm-12">
-                            <label for="input_model-title" class="form-label">{"Title: "}</label>
-                        </div>
-                        <div class="col-9 col-sm-12">
-                            <input
-                                type="text"
-                                required=true
-                                class="form-input"
-                                id="input_model-title"
-                                placeholder="Title"
-                                value={model_title}
-                                oninput=link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateTitle(input.value)
-                                }) />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-3 col-sm-12">
-                            <label class="form-label" for="input_model-subtitle">{"Sub-Title: "}</label>
-                        </div>
-                        <div class="col-9 col-sm-12">
-                            <input
-                                type="text"
-                                class="form-input"
-                                id="input_model-subtitle"
-                                value={model_subtitle}
-                                oninput=link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateSubtitle(input.value)
-                                })
-                            />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-3 col-sm-12">
-                            <label class="form-label" for="input_model-submit_label">{"Submit button label: "}</label>
-                        </div>
-                        <div class="col-9 col-sm-12">
-                            <input
-                                type="text"
-                                class="form-input"
-                                id="input_model-submit_label"
-                                value={&model.submit_label}
-                                oninput=link.callback(move |input: InputData|
-                                {
-                                    Msg::UpdateSubmitLabel(input.value)
-                                })
-                                />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-3 col-sm-12"></div>
-                        <div class="col-9 col-sm-12">
-                            <div class="columns">
-                                <div class="column col-3 col-mr-auto">
-                                    <Button onclick=link.callback(|_| Msg::NewField) primary=true>
-                                        <i class="icon icon-plus"></i>
-                                        {" New field "}
-                                    </Button>
-                                </div>
-                                <div class="column col-2 col-ml-auto">
-                                    <Button onclick=link.callback(|_| Msg::NewGenerate) primary=true>
-                                        <i class="icon icon-plus"></i>
-                                        {" Generate "}
-                                    </Button>
-                                </div>
-                            </div>
+                        <div class="column col-2 col-ml-auto">
+                            <Button onclick=link.callback(|_| Msg::NewGenerate) primary=true>
+                                <i class="icon icon-plus"></i>
+                                {" Generate "}
+                            </Button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ModelForm>
     }
 }
 
