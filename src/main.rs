@@ -38,7 +38,7 @@ pub struct EditingEnumValue {
     enum_value: EnumValues,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct GeneratedFile {
     file_name: String,
     language: &'static str,
@@ -194,7 +194,6 @@ pub enum Msg {
     MoveEnumValueDown(usize),
 
     NewGenerate,
-    SelectFile(usize),
     /*
 
     NewListValue,
@@ -346,10 +345,6 @@ impl Component for App {
                     },
                     _ => (),
                 }
-                true
-            }
-            Msg::SelectFile(index) => {
-                self.state.selected_file = index;
                 true
             }
             Msg::EditField(index) => {

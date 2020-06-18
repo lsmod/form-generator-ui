@@ -15,6 +15,7 @@ use crate::Msg;
 mod components;
 use self::components::{
     button::Button, field_list_container::FieldListContainer, field_list_item::FieldListItem,
+    generated_files_pannel::GeneratedFilesPannel,
 };
 
 // TODO refactor into components:
@@ -37,7 +38,6 @@ pub fn main_view(
     selected_file: usize,
     top_view: Html,
 ) -> Html {
-    let generated_files_view = view_generated_files(link, generated_files, selected_file);
     html! {
         <div style="margin-left: 5vw; margin-right: 5vw; margin-top: 20px;">
             { top_view }
@@ -56,39 +56,8 @@ pub fn main_view(
                     })
                 }
             </FieldListContainer>
-            {generated_files_view}
+            <GeneratedFilesPannel files=generated_files/>
         </div>
-    }
-}
-
-pub fn view_generated_files(
-    link: &ComponentLink<App>,
-    generated_files: &Vec<GeneratedFile>,
-    selected_file: usize,
-) -> Html {
-    if generated_files.len() > 0 {
-        html! {
-            <div style="margin-top: 20px;">
-                <h2 style="text-align: center;">
-                    <i>{"Source Files:"}</i>
-                </h2>
-                <ul class="tab tab-block" >
-                {for generated_files.iter().enumerate().map(|(index, file)| {
-                    let li_class = if index == selected_file { "tab-item active"} else { "tab-item"};
-                    html!{
-                    <li class={li_class} onclick=link.callback(move |_| Msg::SelectFile(index))>
-                      <a href="#">{&file.file_name}</a>
-                    </li>
-                    }
-                })}
-                </ul>
-                <pre class="code" data-lang={generated_files[selected_file].language}>
-                    <code>{&generated_files[selected_file].content}</code>
-                </pre>
-            </div>
-        }
-    } else {
-        html! {}
     }
 }
 
