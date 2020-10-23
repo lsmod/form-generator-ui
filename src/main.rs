@@ -710,6 +710,10 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
+        // TODO: Editor component
+        // TODO: NewFieldEditor component
+        // TODO: EditFieldEditor component
+        // TODO: FieldListEditor component
         let top_view = match &self.state.editing_mode {
             EditorMode::CreatingField(_) => self.view_new_field(),
             EditorMode::EditingField(_) => self.view_editing_field(),
