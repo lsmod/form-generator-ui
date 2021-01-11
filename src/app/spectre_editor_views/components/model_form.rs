@@ -1,4 +1,4 @@
-use crate::form_model::form_model::Model;
+use crate::app::form_model::form_model::Model;
 use yew::html::InputData;
 use yew::{
     html, html::Renderable, Callback, Children, Component, ComponentLink, Html, Properties,

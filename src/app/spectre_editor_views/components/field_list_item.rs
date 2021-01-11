@@ -1,5 +1,5 @@
-use crate::spectre_editor_views::components::button::Button;
-use crate::Field;
+use crate::app::spectre_editor_views::components::button::Button;
+use crate::app::Field;
 use yew::{html, Callback, Children, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]

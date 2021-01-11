@@ -1,25 +1,14 @@
-#![recursion_limit = "1024"]
-extern crate strum;
-#[macro_use]
-extern crate strum_macros;
-#[macro_use]
-extern crate serde_derive;
-extern crate askama;
-extern crate inflector;
-extern crate serde;
-extern crate serde_json;
-
 mod spectre_editor_views;
-use crate::spectre_editor_views::main_view;
-use crate::spectre_editor_views::view_create_enum_btn_container;
-use crate::spectre_editor_views::view_creating_enum_values;
-use crate::spectre_editor_views::view_edit_field_container;
-use crate::spectre_editor_views::view_edit_model_view;
-use crate::spectre_editor_views::view_editing_enum_value;
-use crate::spectre_editor_views::view_enum_values_container;
-use crate::spectre_editor_views::view_enum_values_list_container;
-use crate::spectre_editor_views::view_field_type_select;
-use crate::spectre_editor_views::view_new_field_container;
+use crate::app::spectre_editor_views::main_view;
+use crate::app::spectre_editor_views::view_create_enum_btn_container;
+use crate::app::spectre_editor_views::view_creating_enum_values;
+use crate::app::spectre_editor_views::view_edit_field_container;
+use crate::app::spectre_editor_views::view_edit_model_view;
+use crate::app::spectre_editor_views::view_editing_enum_value;
+use crate::app::spectre_editor_views::view_enum_values_container;
+use crate::app::spectre_editor_views::view_enum_values_list_container;
+use crate::app::spectre_editor_views::view_field_type_select;
+use crate::app::spectre_editor_views::view_new_field_container;
 use askama::Template;
 
 use yew::services::ConsoleService;
@@ -833,7 +822,7 @@ impl App {
         view_field_type_select(&self.link, field_type)
     }
 }
-
-fn main() {
-    yew::start_app::<App>();
-}
+//
+// fn main() {
+//     yew::start_app::<App>();
+// }

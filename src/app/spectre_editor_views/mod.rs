@@ -1,17 +1,17 @@
-use crate::form_model::form_model::EnumValues;
-use crate::form_model::form_model::Field;
-use crate::form_model::form_model::FieldDataType;
-use crate::form_model::form_model::Model;
+use crate::app::form_model::form_model::EnumValues;
+use crate::app::form_model::form_model::Field;
+use crate::app::form_model::form_model::FieldDataType;
+use crate::app::form_model::form_model::Model;
 
 use strum::IntoEnumIterator;
 use yew::components::Select;
 use yew::html::InputData;
 use yew::{html, ComponentLink, Html};
 
-use crate::App;
-use crate::EditingEnumValue;
-use crate::GeneratedFile;
-use crate::Msg;
+use crate::app::App;
+use crate::app::EditingEnumValue;
+use crate::app::GeneratedFile;
+use crate::app::Msg;
 mod components;
 use self::components::{
     button::Button, field_list_container::FieldListContainer, field_list_item::FieldListItem,

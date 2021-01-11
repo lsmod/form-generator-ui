@@ -1,4 +1,4 @@
-use crate::GeneratedFile;
+use crate::app::GeneratedFile;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]
