@@ -4,7 +4,7 @@ use crate::app::form_model::form_model::FieldDataType;
 use crate::app::form_model::form_model::Model;
 
 use strum::IntoEnumIterator;
-use yew::components::Select;
+// use yew::components::Select;
 use yew::html::InputData;
 use yew::{html, ComponentLink, Html};
 
@@ -189,12 +189,18 @@ pub fn view_editing_enum_value(
 
 // TODO clone select component and add class, id param as a prop
 pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataType) -> Html {
+    // TODO create a select element (there isn't any more)
+    // html! {
+    //     <div class="form-group" id="field-editing_type_form-group">
+    //         <Select<FieldDataType>
+    //             selected=Some(field_type)
+    //             options=FieldDataType::iter().collect::<Vec<_>>()
+    //             onchange=link.callback(Msg::UpdateFieldType) />
+    //     </div>
+    // }
     html! {
         <div class="form-group" id="field-editing_type_form-group">
-            <Select<FieldDataType>
-                selected=Some(field_type)
-                options=FieldDataType::iter().collect::<Vec<_>>()
-                onchange=link.callback(Msg::UpdateFieldType) />
+
         </div>
     }
 }

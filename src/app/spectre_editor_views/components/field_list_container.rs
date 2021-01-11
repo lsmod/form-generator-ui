@@ -4,6 +4,7 @@ use yew::{
 
 #[derive(Properties, Clone)]
 pub struct Props {
+    #[prop_or_default]
     pub children: Children,
 }
 
@@ -45,7 +46,7 @@ impl Component for FieldListContainer {
                     </tr>
                   </thead>
                   <tbody>
-                  {self.props.children.render()}
+                  { for self.props.children.iter() }
                   </tbody>
                 </table>
             </div>

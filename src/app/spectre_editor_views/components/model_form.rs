@@ -8,19 +8,20 @@ use yew::{
 
 #[derive(Properties, Clone)]
 pub struct Props {
+    #[prop_or_default]
     pub children: Children,
-    #[props(required)]
+    // #[props(required)]
     pub model: Model,
     // TODO make it optionnal by having an option
     // @see https://dev.to/deciduously/lets-build-a-rust-frontend-with-yew---part-2-1ech
     // @see https://github.com/deciduously/hunt-the-wumpus/blob/66938953772f75051658a222d2643ed881db694c/part2/src/components/controls.rs
-    #[props(required)]
+    // #[props(required)]
     pub update_name: Callback<String>,
-    #[props(required)]
+    // #[props(required)]
     pub update_title: Callback<String>,
-    #[props(required)]
+    // #[props(required)]
     pub update_subtitle: Callback<String>,
-    #[props(required)]
+    // #[props(required)]
     pub update_submit_label: Callback<String>,
 }
 
@@ -148,7 +149,7 @@ impl Component for ModelForm {
                                     />
                             </div>
                         </div>
-                        {self.props.children.render()}
+                        { for self.props.children.iter() }
                     </div>
                 </div>
             </div>

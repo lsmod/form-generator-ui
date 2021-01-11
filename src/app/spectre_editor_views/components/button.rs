@@ -7,14 +7,18 @@ use yew::{
 
 #[derive(Properties, Clone)]
 pub struct Props {
+    #[prop_or_default]
     pub children: Children,
+    #[prop_or_default]
     pub text: String,
+    #[prop_or_default]
     pub primary: bool,
+    #[prop_or_default]
     pub id: Option<String>,
     // TODO make it optionnal by having an option
     // @see https://dev.to/deciduously/lets-build-a-rust-frontend-with-yew---part-2-1ech
     // @see https://github.com/deciduously/hunt-the-wumpus/blob/66938953772f75051658a222d2643ed881db694c/part2/src/components/controls.rs
-    #[props(required)]
+    // #[props(required)]
     pub onclick: Callback<()>,
 }
 
@@ -56,12 +60,12 @@ impl Component for Button {
         match &self.props.id {
             Some(id) => html! {
                 <button id=id class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
-                    {self.props.children.render()}
+                    { for self.props.children.iter() }
                 </button>
             },
             None => html! {
                 <button class=btn_class type="button" onclick=self.link.callback(|_|Msg::Click)>
-                    {self.props.children.render()}
+                    { for self.props.children.iter() }
                 </button>
             },
         }

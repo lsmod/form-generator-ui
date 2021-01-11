@@ -51,7 +51,6 @@ enum EditorMode {
 pub struct App {
     link: ComponentLink<App>,
     state: State,
-    console: ConsoleService,
 }
 
 #[derive(Debug)]
@@ -209,9 +208,12 @@ impl Component for App {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         App {
             link,
-            console: ConsoleService::new(),
             state: State::default(),
         }
+    }
+
+    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
+        true
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -483,7 +485,7 @@ impl Component for App {
                     }
                     EditorMode::Listing => (),
                 };
-                self.console.log(format!("{:?}", self.state).as_str());
+                ConsoleService::info(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::CancelEditEnumValues => {
@@ -568,7 +570,7 @@ impl Component for App {
                     None => (),
                 }
                 self.state.creating_enum_value = None;
-                self.console.log(format!("{:?}", self.state).as_str());
+                ConsoleService::info(format!("{:?}", self.state).as_str());
                 true
             }
             Msg::UpdateFieldEnumValues => {
@@ -605,7 +607,7 @@ impl Component for App {
                     _ => (),
                 }
                 self.state.editing_enum_value = None;
-                self.console.log(format!("{:?}", self.state).as_str());
+                ConsoleService::info(format!("{:?}", self.state).as_str());
                 true
             }
             // TODO remove validation if 1 item in list
@@ -685,14 +687,14 @@ impl Component for App {
                     language: "JSX",
                     content: form_template.render().unwrap(),
                 });
-                self.console.log(
-                    format!(
-                        "file: {}\ncontent: \n{}",
-                        self.state.generated_files[0].file_name,
-                        self.state.generated_files[0].content
-                    )
-                    .as_str(),
-                );
+                // ConsoleService::info(
+                //     format!(
+                //         "file: {}\ncontent: \n{}",
+                //         self.state.generated_files[0].file_name,
+                //         self.state.generated_files[0].content
+                //     )
+                //     .as_str(),
+                // );
                 true
             }
         }
