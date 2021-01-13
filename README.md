@@ -3,7 +3,7 @@
 Experimental project. Just Playing arround with yew.rs and spectre css (https://picturepan2.github.io/spectre/).
 
 UI visible at this page:\
-https://github.com/lsmod/form-generator-ui
+https://lsmod.github.io/form-generator-ui/
 
 ## Idea
 
