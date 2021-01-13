@@ -6,7 +6,7 @@ use crate::app::form_model::form_model::Model;
 use strum::IntoEnumIterator;
 // use yew::components::Select;
 use yew::html::InputData;
-use yew::{html, ComponentLink, Html};
+use yew::{html, ChangeData, ComponentLink, Html};
 
 use crate::app::App;
 use crate::app::EditingEnumValue;
@@ -187,21 +187,51 @@ pub fn view_editing_enum_value(
     }
 }
 
-// TODO clone select component and add class, id param as a prop
 pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataType) -> Html {
-    // TODO: create a select element (there isn't any more)
-    // see: https://docs.rs/yew/0.9.0/src/yew/components/select.rs.html#1-110
-    // html! {
-    //     <div class="form-group" id="field-editing_type_form-group">
-    //         <Select<FieldDataType>
-    //             selected=Some(field_type)
-    //             options=FieldDataType::iter().collect::<Vec<_>>()
-    //             onchange=link.callback(Msg::UpdateFieldType) />
-    //     </div>
-    // }
     html! {
         <div class="form-group" id="field-editing_type_form-group">
-
+            <select name="status" onchange=link.callback(|event| {
+                        match event {
+                            ChangeData::Select(elem) => {
+                                let index = elem.selected_index();
+                                match index {
+                                    0 => Msg::UpdateFieldType(FieldDataType::Text),
+                                    1 => Msg::UpdateFieldType(FieldDataType::Email),
+                                    2 => Msg::UpdateFieldType(FieldDataType::Url),
+                                    3 => Msg::UpdateFieldType(FieldDataType::Password),
+                                    4 => Msg::UpdateFieldType(FieldDataType::Phone),
+                                    5 => Msg::UpdateFieldType(FieldDataType::LongText),
+                                    6 => Msg::UpdateFieldType(FieldDataType::Date),
+                                    7 => Msg::UpdateFieldType(FieldDataType::Number),
+                                    8 => Msg::UpdateFieldType(FieldDataType::Radio),
+                                    9 => Msg::UpdateFieldType(FieldDataType::Checkbox),
+                                    10 => Msg::UpdateFieldType(FieldDataType::SelectList),
+                                    11 => Msg::UpdateFieldType(FieldDataType::EditableSelectList),
+                                    12 => Msg::UpdateFieldType(FieldDataType::MultiSelectList),
+                                    13 => Msg::UpdateFieldType(FieldDataType::EditableMultiSelectList),
+                                    _ => Msg::UpdateFieldType(FieldDataType::Text)
+                                }
+                            }
+                            _ => {
+                                unreachable!();
+                            }
+                        }
+                    })>
+                <option value="Text">{ "Text" }</option>
+                <option value="Email">{"Email"}</option>
+                <option value="Url">{"Url"}</option>
+                <option value="Password">{"Password"}</option>
+                <option value="Phone">{"Phone"}</option>
+                <option value="LongText">{"LongText"}</option>
+                <option value="Date">{"Date"}</option>
+                <option value="Number">{"Number"}</option>
+                <option value="Radio">{"Radio"}</option>
+                <option value="Checkbox">{"Checkbox"}</option>
+                <option value="SelectList">{"SelectList"}</option>
+                <option value="EditableSelectList">{"EditableSelectList"}</option>
+                <option value="MultiSelectList">{"MultiSelectList"}</option>
+                <option value="EditableMultiSelectList">{"EditableMultiSelectList"}</option>
+            </select>
         </div>
     }
 }
