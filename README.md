@@ -4,17 +4,21 @@ Experimental project. Just Playing arround with yew.rs and https://picturepan2.g
 
 ### Getting Started
 
-install wasm-pack
+install wasm-pack:
 https://rustwasm.github.io/wasm-pack/installer/
 
-npm install --global rollup
-
 ```bash
-cargo web start --auto-reload
+npm install
 ```
 
 ### Build
 
 ```bash
-cargo web deploy
+npm run build
+```
+
+### dev
+
+```bash
+npm run dev
 ```
