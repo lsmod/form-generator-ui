@@ -9,7 +9,7 @@ https://lsmod.github.io/form-generator-ui/
 
 The idea is to generate code for creating forms. The Main goal is to speed up development process by generating a lot of boilerplate code.
 
-The UI make easy to create a model from which the form code gets generated.
+The UI makes easy to create a model from which the form's code gets generated.
 
 ## Follow up
 
