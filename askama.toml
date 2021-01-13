@@ -1,7 +1,0 @@
-[general]
-default_syntax = "react"
-
-[[syntax]]
-name = "react"
-expr_start = "{="
-expr_end = "=}"
