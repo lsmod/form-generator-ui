@@ -189,7 +189,8 @@ pub fn view_editing_enum_value(
 
 // TODO clone select component and add class, id param as a prop
 pub fn view_field_type_select(link: &ComponentLink<App>, field_type: FieldDataType) -> Html {
-    // TODO create a select element (there isn't any more)
+    // TODO: create a select element (there isn't any more)
+    // see: https://docs.rs/yew/0.9.0/src/yew/components/select.rs.html#1-110
     // html! {
     //     <div class="form-group" id="field-editing_type_form-group">
     //         <Select<FieldDataType>
