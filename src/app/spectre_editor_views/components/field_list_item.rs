@@ -6,15 +6,10 @@ use yew::{html, Callback, Children, Component, ComponentLink, Html, Properties, 
 pub struct Props {
     #[prop_or_default]
     pub children: Children,
-    // #[props(required)]
     pub field: Field,
-    // #[props(required)]
     pub up_onclick: Callback<()>,
-    // #[props(required)]
     pub down_onclick: Callback<()>,
-    // #[props(required)]
     pub delete_onclick: Callback<()>,
-    // #[props(required)]
     pub edit_onclick: Callback<()>,
 }
 

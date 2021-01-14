@@ -1,7 +1,4 @@
-use yew::{
-    html, html::Renderable, Callback, Children, Component, ComponentLink, Html, Properties,
-    ShouldRender,
-};
+use yew::{html, Callback, Children, Component, ComponentLink, Html, Properties, ShouldRender};
 
 // TODO adds icons props add primary, secondary (outline)
 
@@ -18,7 +15,6 @@ pub struct Props {
     // TODO make it optionnal by having an option
     // @see https://dev.to/deciduously/lets-build-a-rust-frontend-with-yew---part-2-1ech
     // @see https://github.com/deciduously/hunt-the-wumpus/blob/66938953772f75051658a222d2643ed881db694c/part2/src/components/controls.rs
-    // #[props(required)]
     pub onclick: Callback<()>,
 }
 

@@ -1,6 +1,4 @@
-use yew::{
-    html, html::Renderable, Children, Component, ComponentLink, Html, Properties, ShouldRender,
-};
+use yew::{html, Children, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]
 pub struct Props {
